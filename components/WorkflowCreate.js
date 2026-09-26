@@ -1,0 +1,12 @@
+'use client';
+import {useState} from 'react';
+import Link from 'next/link';
+import {useRouter} from 'next/navigation';
+import {ArrowLeft, ArrowRight, GitBranch, PhoneIncoming, PhoneOutgoing} from 'lucide-react';
+import Shell from './Shell';
+import {apiFetch} from './api-client';
+export default function WorkflowCreate(){
+ const router=useRouter(),[name,setName]=useState(''),[trigger,setTrigger]=useState('inbound'),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ async function create(e){e.preventDefault();setBusy(true);setError('');try{const response=await apiFetch('/api/workflows',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,trigger})});const data=await response.json();if(!response.ok)throw Error(data.error||'Could not create workflow.');router.push(`/workflows/${data._id}`)}catch(e){setError(e.message);setBusy(false)}}
+ return <Shell active="/workflows"><div className="wf-page wf-narrow"><Link href="/workflows" className="wf-back"><ArrowLeft size={17}/> All workflows</Link><p className="wf-eyebrow">STEP 1 / CREATE</p><h1>New workflow</h1><p className="wf-subtitle">Start with a simple call path. Add decisions and more conversation steps on the canvas.</p><form className="wf-panel wf-create" onSubmit={create}><span className="wf-feature-icon"><GitBranch size={25}/></span><label className="wf-field">Workflow name<input autoFocus required maxLength={120} value={name} onChange={e=>setName(e.target.value)} placeholder="For example, Sales intake flow"/></label><span className="wf-field-caption">How will this flow start?</span><div className="wf-trigger-grid"><button type="button" onClick={()=>setTrigger('inbound')} className={trigger==='inbound'?'chosen':''}><PhoneIncoming size={22}/><strong>Inbound call</strong><small>Answer a customer who calls your business.</small></button><button type="button" onClick={()=>setTrigger('outbound')} className={trigger==='outbound'?'chosen':''}><PhoneOutgoing size={22}/><strong>Outbound campaign</strong><small>Use this flow when a campaign initiates a call.</small></button></div>{error&&<p className="wf-error" role="alert">{error}</p>}<div className="wf-form-footer"><Link href="/workflows" className="wf-secondary">Cancel</Link><button className="wf-primary" disabled={busy||!name.trim()}>{busy?'Creating…':'Create and open canvas'} <ArrowRight size={17}/></button></div></form></div></Shell>
+}
