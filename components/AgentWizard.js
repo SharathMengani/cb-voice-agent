@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, AudioLines, BookOpen, Check, CircleHelp, FileTex
 import Shell from './Shell';
 import { apiFetch } from './api-client';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API = '';
 const STEPS = ['Basics', 'Voice', 'Knowledge', 'Behavior', 'Test'];
 const languageChoices = ['English (India)', 'Hindi', 'Telugu', 'Tamil', 'Kannada', 'Malayalam', 'Marathi'];
 const starter = { name: '', purpose: '', role: 'Customer support', company: 'Acme Support', instructions: '', languages: ['English (India)'], fallbackLanguage: 'English (India)', detectCallerLanguage: true, voice: 'Aarav', speakingSpeed: 'Natural', knowledgeSources: [], actions: { accountLookup: false, supportTicket: false }, greeting: 'Welcome to Acme Support. How can I help you today?', style: 'Concise and helpful', unanswered: 'Ask to connect with a person', endOfCall: 'Summarize the outcome', silenceSeconds: 8, maxCallMinutes: 15, confirmTicket: true };

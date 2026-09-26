@@ -5,7 +5,7 @@ import { AudioLines, FilePenLine, Plus, Radio, Search, Sparkles, X } from 'lucid
 import Shell from './Shell';
 import { apiFetch } from './api-client';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API = '';
 export default function VoiceAgentsList() {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,7 @@ export default function VoiceAgentsList() {
   const [filter, setFilter] = useState('All');
   const [query, setQuery] = useState('');
   const [showTip, setShowTip] = useState(true);
-  useEffect(() => { apiFetch(`${API}/api/voice-agents`).then(async res => { if (!res.ok) throw Error('Unable to load voice agents. Check that the API is running.'); return res.json(); }).then(setAgents).catch(e => setError(e.message)).finally(() => setLoading(false)); }, []);
+  useEffect(() => { apiFetch(`${API}/api/voice-agents`).then(async res => { if (!res.ok) throw Error('Unable to load voice agents.'); return res.json(); }).then(setAgents).catch(e => setError(e.message)).finally(() => setLoading(false)); }, []);
   const shown = useMemo(() => agents.filter(a => (filter === 'All' || (filter === 'Ready' ? a.status === 'ready' : a.status === 'draft')) && (a.name || '').toLowerCase().includes(query.toLowerCase())), [agents, filter, query]);
   return <Shell><div className="page-heading"><div><p className="eyebrow">VOICE AGENTS</p><h1>Voice agents</h1><p className="muted">Build agents that answer and resolve customer calls.</p></div><Link className="button primary" href="/voice-agents/new"><Plus size={20}/> Create voice agent</Link></div>
     <div className="stats-grid"><div className="stat-card"><span className="stat-icon purple"><AudioLines/></span><div><span>Total agents</span><strong>{agents.length}</strong></div></div><div className="stat-card"><span className="stat-icon green"><Radio/></span><div><span>Ready agents</span><strong>{agents.filter(a => a.status === 'ready').length}</strong></div></div><div className="stat-card"><span className="stat-icon amber"><FilePenLine/></span><div><span>Draft agents</span><strong>{agents.filter(a => a.status === 'draft').length}</strong></div></div></div>

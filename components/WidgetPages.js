@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import {ArrowLeft,ArrowRight,Check,Copy,Globe2,KeyRound,LockKeyhole,Plus,ShieldCheck,UserRound,PanelsTopLeft,Activity} from 'lucide-react';
 import Shell from './Shell';
-import {apiFetch,API} from './api-client';
+import {apiFetch} from './api-client';
 function Field({label,children,hint}){return <label className="ws-field">{label}{children}{hint&&<small>{hint}</small>}</label>}
 function Back({href='/widgets',children='Voice widgets'}){return <Link className="ws-back" href={href}><ArrowLeft size={16}/>{children}</Link>}
 function Message({error,notice}){return <>{error&&<div role="alert" className="ws-error">{error}</div>}{notice&&<div role="status" className="ws-success"><Check size={16}/>{notice}</div>}</>}
@@ -52,6 +52,6 @@ export function WidgetSecurity({id}){
 export function WidgetInstall({id}){
  const {row,loading,error}=useWidget(id),[copied,setCopied]=useState(false),[counts,setCounts]=useState(null),[origin,setOrigin]=useState('');
  useEffect(()=>{setOrigin(window.location.origin);apiFetch('/api/records/call?limit=250').then(r=>r.json()).then(rows=>{if(Array.isArray(rows))setCounts(rows.filter(r=>r.data?.widgetId===id).length)}).catch(()=>{})},[id]);
- const snippet=`<script src="${origin}/chatbucket-voice.js" data-widget-id="${id}" data-api-origin="${API}"></script>`;
+ const snippet=`<script src="${origin}/chatbucket-voice.js" data-widget-id="${id}"></script>`;
  return <Shell active="/widgets"><div className="ws-page"><Back/><span className="ws-kicker">WIDGET / INSTALL & ACTIVITY</span><h1>{row?.title||'Widget'} · Install</h1>{row&&<Tabs id={id} view="install"/>}{loading?<div className="ws-panel">Loading installation…</div>:row?<div className="ws-grid"><section className="ws-panel"><h2>Website embed</h2><p className="ws-muted">Add this script to a verified website before the closing body tag.</p><pre className="ws-code"><code>{snippet}</code></pre><button className="ws-secondary" onClick={()=>navigator.clipboard.writeText(snippet).then(()=>setCopied(true))}><Copy size={16}/>{copied?'Copied':'Copy snippet'}</button><div className="ws-notice"><ShieldCheck size={18}/> {row.status==='published'?'This widget is published. Only verified origins can request sessions.':'Publish after DNS verification to open customer sessions.'}</div></section><section className="ws-panel"><h2>Demo activity</h2><div className="ws-summary"><span>Website sessions</span><strong>Not tracked in shared storage</strong><span>Widget demo calls</span><strong>{counts===null?'Loading…':counts}</strong><span>Verified domains</span><strong>{row.data.security.domains.filter(d=>d.status==='verified').length}</strong></div><p className="ws-footnote">Counts reflect only this demo API process. Live analytics require a durable event store.</p><Link className="ws-secondary" href="/ai-handoff"><Activity size={16}/> Review call queue</Link></section></div>:<Message error={error}/>}</div></Shell>
 }

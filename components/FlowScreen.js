@@ -25,7 +25,7 @@ import AgentStudio from './AgentStudio';
 import CampaignWizard from './CampaignWizard';
 import OutboundHandoff from './OutboundHandoff';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API = '';
 const nextNumber = number => number < 51 ? number + 1 : 43;
 const workflowNext = number => ({24:27,26:24})[number] || nextNumber(number);
 const groupFor = number => groups.find(g => number >= g.first && number <= g.last);
