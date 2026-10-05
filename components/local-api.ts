@@ -122,7 +122,7 @@ function updateRecord(state, record, patch) {
   if (patch.data && typeof patch.data==='object') record.data={...record.data,...patch.data};
   record.updatedAt=now(); save(state); return record;
 }
-function collectionRoute(state, route, method, input, root, kind, createData) {
+function collectionRoute(state, route, method, input, root, kind, createData = undefined) {
   if (route===root && method==='GET') return json(state.records.filter(row=>row.kind===kind).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)));
   if (route===root && method==='POST') {
     const title=String(input.name||input.title||'Untitled').trim();
@@ -137,7 +137,7 @@ function collectionRoute(state, route, method, input, root, kind, createData) {
   return null;
 }
 
-export async function localApiFetch(input, options={}) {
+export async function localApiFetch(input: string, options: RequestInit = {}) {
   const state=load(), route=routeOf(input), method=(options.method||'GET').toUpperCase(), inputBody=body(options);
 
   if (route==='/api/health') return json({status:'ok',mode:'browser-local',database:true,cache:true});

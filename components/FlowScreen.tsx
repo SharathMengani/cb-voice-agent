@@ -48,7 +48,7 @@ export default function FlowScreen({ number }) {
   const router = useRouter();
   const [records, setRecords] = useState([]);
   const [agents, setAgents] = useState([]);
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState<Record<string, any>>({});
   const [selection, setSelection] = useState('');
   const [feedback, setFeedback] = useState('');
   const [working, setWorking] = useState(false);
@@ -122,7 +122,7 @@ export default function FlowScreen({ number }) {
   }, [config.kind,config.type,widgetToken,record?._id]);
   function choose(entry) { setSelection(entry._id); setForm(entry.data?.[`screen_${number}`] || {}); localStorage.setItem(`chatbucket:${config.kind}`, entry._id); }
   async function refresh(){const result=await apiFetch(`${API}/api/records/${config.kind}`);if(result.ok)setRecords(await result.json());}
-  async function save({ advance = false, status } = {}) {
+  async function save({ advance = false, status }: { advance?: boolean; status?: string } = {}) {
     setWorking(true); setFeedback('');
     try {
       if(config.type==='customer'){

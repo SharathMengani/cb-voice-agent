@@ -7,7 +7,7 @@ import Shell from './Shell';
 import {apiFetch} from './api-client';
 const weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const perms=[['Manage team and roles','Yes','No','No','No'],['Edit workflows and tools','Yes','No','No','No'],['Review calls and callbacks','Yes','Yes','No','No'],['Manage phone routing','Yes','No','No','No']];
-const Field=({label,children,hint})=><label className="tm-field">{label}{children}{hint&&<small>{hint}</small>}</label>;
+const Field=({label,children,hint=''})=><label className="tm-field">{label}{children}{hint&&<small>{hint}</small>}</label>;
 export function TeamDirectory(){
  const [members,setMembers]=useState([]),[query,setQuery]=useState(''),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const owner={name:'Sharath',email:'Local demo'};

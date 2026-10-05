@@ -35,7 +35,7 @@ const agentNavigation = [
   { label:'Profile & Settings', icon:Settings2, href:'/flow/21' }
 ];
 
-export default function Shell({children,workspace='owner',active}) {
+export default function Shell({children,workspace='owner',active=''}) {
   const items=workspace==='agent'?agentNavigation:navigation;
   const user=workspace==='agent'?'Priya Sharma':'Sharath';
   return <div className="app-shell">

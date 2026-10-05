@@ -6,8 +6,8 @@ import {ArrowLeft,ArrowRight,CalendarClock,Check,ChevronRight,Clock3,GitBranch,P
 import Shell from './Shell';
 import {apiFetch} from './api-client';
 const weekdays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-function Field({label,children,hint}){return <label className="rt-field">{label}{children}{hint&&<small>{hint}</small>}</label>}
-function Alert({error,notice}){return <>{error&&<div className="rt-error" role="alert">{error}</div>}{notice&&<div className="rt-success" role="status"><Check size={16}/>{notice}</div>}</>}
+function Field({label,children,hint=''}){return <label className="rt-field">{label}{children}{hint&&<small>{hint}</small>}</label>}
+function Alert({error,notice=''}){return <>{error&&<div className="rt-error" role="alert">{error}</div>}{notice&&<div className="rt-success" role="status"><Check size={16}/>{notice}</div>}</>}
 export function RoutingList(){
  const [rows,setRows]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState('');
  useEffect(()=>{let active=true;apiFetch('/api/routing').then(async r=>{const data=await r.json();if(!r.ok)throw Error(data.error||'Could not load routes.');if(active)setRows(data)}).catch(e=>{if(active)setError(e.message)}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[]);

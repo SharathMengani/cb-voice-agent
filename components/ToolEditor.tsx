@@ -7,9 +7,9 @@ import Shell from './Shell';
 import {apiFetch} from './api-client';
 import {catalog} from './ToolCatalog';
 const starter={api:{url:'',method:'GET',timeout:15,requestBody:''},transfer:{targetAgentId:'',summaryTemplate:'Caller requested a different voice agent.'},hangup:{closingMessage:'Thank you for calling.'},webhook:{eventName:'customer.created',payloadExample:'{}'},handoff:{department:'Support',reason:'The caller asked for a person.',fallback:'callback'},datetime:{timezone:'Asia/Kolkata',format:'date-and-time'}};
-function Field({label,children,hint}){return <label className="tl-field">{label}{children}{hint&&<small>{hint}</small>}</label>}
+function Field({label,children,hint=''}){return <label className="tl-field">{label}{children}{hint&&<small>{hint}</small>}</label>}
 const title={api:'API Request',transfer:'Transfer call',hangup:'Hang up',webhook:'Received webhook',handoff:'AI handoff',datetime:'Date & time'};
-export default function ToolEditor({type,id}){
+export default function ToolEditor({type='api',id=''}){
  const router=useRouter(),[form,setForm]=useState({name:title[type]||'',config:starter[type]||{}}),[record,setRecord]=useState(null),[agents,setAgents]=useState([]),[busy,setBusy]=useState(false),[loading,setLoading]=useState(Boolean(id)),[error,setError]=useState(''),[issues,setIssues]=useState([]),[preview,setPreview]=useState(''),[dirty,setDirty]=useState(false),[notice,setNotice]=useState('');
  useEffect(()=>{let active=true;const urls=id?[`/api/tools/${id}`,'/api/voice-agents']:['/api/voice-agents'];Promise.all(urls.map(url=>apiFetch(url))).then(async responses=>{const results=await Promise.all(responses.map(r=>r.json()));for(let i=0;i<responses.length;i++)if(!responses[i].ok)throw Error(results[i].error||'Could not load tool.');if(active){if(id){setRecord(results[0]);setForm({name:results[0].title,config:results[0].data.config});setAgents(results[1])}else setAgents(results[0])}}).catch(e=>{if(active)setError(e.message)}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[id]);
  const activeType=record?.data?.type||type;const item=catalog.find(x=>x.type===activeType);
