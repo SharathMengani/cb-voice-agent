@@ -46,7 +46,7 @@ export default function OutboundHandoff({ records, selected, onSelect, onUpdate 
       if (!response.ok) throw Error(data.error || 'Unable to update the handoff');
       onSelect(data);
       await onUpdate();
-      if (accept) router.push('/flow/24');
+      if (accept) router.push('/agent/live-call');
       else setMessage('You declined the handoff. The demo call was marked ended.');
     } catch (error) {
       setMessage(error.message);
@@ -116,7 +116,7 @@ export default function OutboundHandoff({ records, selected, onSelect, onUpdate 
               className={
                 'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
               }
-              href="/flow/49"
+              href="/campaigns/monitoring"
             >
               Campaign monitoring <ArrowRight size={16} />
             </Link>
@@ -137,7 +137,7 @@ export default function OutboundHandoff({ records, selected, onSelect, onUpdate 
               <h2>Outbound campaign handoff — Sales Concierge AI</h2>
               <p>September Renewal Outreach</p>
             </div>
-            <Link href="/flow/21" aria-label="Close handoff">
+            <Link href="/agent/inbox" aria-label="Close handoff">
               <X size={20} />
             </Link>
           </header>

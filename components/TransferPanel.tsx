@@ -32,7 +32,7 @@ export default function TransferPanel({ form, setForm, feedback, working, onTran
         <h2>
           <Repeat2 size={20} /> Transfer this call
         </h2>
-        <Link href="/flow/24" aria-label="Close transfer panel">
+        <Link href="/agent/live-call" aria-label="Close transfer panel">
           <X size={20} />
         </Link>
       </div>
@@ -122,7 +122,7 @@ export default function TransferPanel({ form, setForm, feedback, working, onTran
         className={
           'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
         }
-        href="/flow/24"
+        href="/agent/live-call"
       >
         Cancel
       </Link>

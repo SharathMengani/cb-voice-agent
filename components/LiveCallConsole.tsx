@@ -47,7 +47,7 @@ export default function LiveCallConsole({
       if (!result.ok) throw Error(value.error);
       await onUpdate();
       setFeedback(status === 'ended' ? 'Call ended. Add its outcome next.' : 'Private note saved.');
-      if (status === 'ended') router.push('/flow/27');
+      if (status === 'ended') router.push('/agent/call-outcome');
     } catch (error) {
       setFeedback(error.message);
     } finally {
@@ -75,7 +75,7 @@ export default function LiveCallConsole({
           <strong>
             Active <small>{active.length}</small>
           </strong>
-          <Link href="/flow/27">Recent</Link>
+          <Link href="/agent/call-outcome">Recent</Link>
         </div>
         {active.map((row) => (
           <button
@@ -187,7 +187,7 @@ export default function LiveCallConsole({
             </span>
             {held ? 'Resume' : 'Hold'}
           </button>
-          <Link href="/flow/25">
+          <Link href="/agent/transfer">
             <span>
               <Repeat2 />
             </span>

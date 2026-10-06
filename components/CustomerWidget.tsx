@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -33,7 +34,7 @@ const cards = [
   ['Troubleshooting', 'Resolve common problems'],
 ];
 export default function CustomerWidget({
-  number,
+  view,
   config,
   record,
   form,
@@ -49,8 +50,8 @@ export default function CustomerWidget({
   const [answer, setAnswer] = useState('');
   const [typing, setTyping] = useState(false);
   const [muted, setMuted] = useState(false);
-  const widgetPath = (value) =>
-    `/flow/${value}${widgetId ? `?widget=${encodeURIComponent(widgetId)}` : ''}`;
+  const widgetPath = (href) =>
+    `${href}${widgetId ? `?widget=${encodeURIComponent(widgetId)}` : ''}`;
   async function ask() {
     const question = String(form['Your question'] || '').trim();
     if (!question) return;
@@ -91,7 +92,7 @@ export default function CustomerWidget({
         }
       >
         <Link
-          href={widgetPath(28)}
+          href={widgetPath('/customer/call')}
           className={'acme-logo text-[21px] font-[750] tracking-[-.7px] flex items-center gap-2'}
         >
           <span className={'acme-logo-glyph text-[#6742f0] text-[22px]'}>◆</span> Acme
@@ -210,36 +211,36 @@ export default function CustomerWidget({
             <AudioLines size={22} />
           </span>
           <h2>
-            {number === 28
+            {view === 'customer-call'
               ? 'Talk to support'
-              : number === 29
+              : view === 'ai-conversation'
                 ? 'Website Support AI'
-                : number === 30
+                : view === 'connecting'
                   ? 'Finding a human specialist'
-                  : number === 31
+                  : view === 'human-conversation'
                     ? 'Priya Sharma joined'
-                    : number === 32
+                    : view === 'customer-callback'
                       ? 'Request a callback'
-                      : number === 33
+                      : view === 'call-rating'
                         ? 'How was your support?'
                         : 'Inbound phone support'}
           </h2>
           <p className={'widget-subtitle text-[11px] text-[#b9b7c9] text-center m-[0_0_18px]'}>
-            {number === 28
+            {view === 'customer-call'
               ? 'Hi! How can we help today?'
-              : number === 29
+              : view === 'ai-conversation'
                 ? 'AI is speaking · Ask your question'
-                : number === 30
+                : view === 'connecting'
                   ? 'The team has your request'
-                  : number === 31
+                  : view === 'human-conversation'
                     ? 'A support specialist is connected'
-                    : number === 32
+                    : view === 'customer-callback'
                       ? 'Our team will contact you'
-                      : number === 33
+                      : view === 'call-rating'
                         ? 'Your call has ended'
                         : 'Acme Support · AI voice agent'}
           </p>
-          {number === 28 && (
+          {view === 'customer-call' && (
             <>
               <p
                 className={
@@ -274,13 +275,13 @@ export default function CustomerWidget({
                 className={
                   'widget-option border border-[#3a394b] rounded-lg text-[#c1bfd1] text-[10px] p-2.75 w-full flex gap-2.25 items-center mt-2.5 [&_svg]:text-[#b89cfd]'
                 }
-                href={widgetPath(32)}
+                href={widgetPath('/customer/callback')}
               >
                 <Phone size={17} /> Choose a callback instead
               </Link>
             </>
           )}
-          {number === 29 && (
+          {view === 'ai-conversation' && (
             <>
               <div
                 className={
@@ -343,13 +344,13 @@ export default function CustomerWidget({
                 <button onClick={() => setMuted(!muted)}>
                   <Volume2 size={18} /> Audio
                 </button>
-                <Link href={widgetPath(33)}>
+                <Link href={widgetPath('/customer/rating')}>
                   <PhoneOff size={18} /> End call
                 </Link>
               </div>
             </>
           )}
-          {number === 30 && (
+          {view === 'connecting' && (
             <>
               <span
                 className={
@@ -392,13 +393,13 @@ export default function CustomerWidget({
               </button>
               <Link
                 className={'widget-link text-[#c6a8ff] text-[11px] m-[16px_auto_4px] underline'}
-                href={widgetPath(32)}
+                href={widgetPath('/customer/callback')}
               >
                 Request a callback instead
               </Link>
             </>
           )}
-          {number === 31 && (
+          {view === 'human-conversation' && (
             <>
               <div
                 className={
@@ -450,13 +451,13 @@ export default function CustomerWidget({
                 <button>
                   <Volume2 size={18} /> Speaker
                 </button>
-                <Link href={widgetPath(33)}>
+                <Link href={widgetPath('/customer/rating')}>
                   <PhoneOff size={18} /> End call
                 </Link>
               </div>
             </>
           )}
-          {number === 32 && (
+          {view === 'customer-callback' && (
             <>
               <div className="callback-icon">
                 <Phone size={26} />
@@ -507,7 +508,7 @@ export default function CustomerWidget({
               </button>
             </>
           )}
-          {number === 33 && (
+          {view === 'call-rating' && (
             <>
               <span
                 className={
@@ -563,14 +564,14 @@ export default function CustomerWidget({
                 Submit rating
               </button>
               <Link
-                href={widgetPath(28)}
+                href={widgetPath('/customer/call')}
                 className={'widget-link text-[#c6a8ff] text-[11px] m-[16px_auto_4px] underline'}
               >
                 Skip for now
               </Link>
             </>
           )}
-          {number === 42 && (
+          {view === 'inbound-call' && (
             <>
               <div
                 className={

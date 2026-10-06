@@ -53,7 +53,7 @@ export default function CampaignList({ records, agents, onUpdate }) {
       if (!response.ok) throw Error(data.error || 'Could not create campaign.');
       localStorage.setItem('chatbucket:campaign', data._id);
       await onUpdate();
-      router.push('/flow/44');
+      router.push('/campaigns/new/basics');
     } catch (e) {
       setError(e.message);
     } finally {
@@ -198,10 +198,10 @@ export default function CampaignList({ records, agents, onUpdate }) {
                   localStorage.setItem('chatbucket:campaign', row._id);
                   router.push(
                     row.status === 'completed'
-                      ? '/flow/51'
+                      ? '/campaigns/results'
                       : row.status === 'running'
-                        ? '/flow/49'
-                        : '/flow/44',
+                        ? '/campaigns/monitoring'
+                        : '/campaigns/new/basics',
                   );
                 }}
               >
