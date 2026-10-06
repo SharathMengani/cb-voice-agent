@@ -9,7 +9,10 @@ export const groups = [
 ];
 const F = (label, type = 'text', options = []) => ({ label, type, options });
 export const screens = {
-  7: {
+  widgets: {
+    reference: 7,
+    storageKey: 'screen_7',
+    group: 'Voice Widget setup',
     title: 'Voice Widgets',
     caption: 'Choose which voice agent answers calls on your website.',
     type: 'list',
@@ -21,7 +24,10 @@ export const screens = {
       'A widget is a separate web calling channel.',
     ],
   },
-  8: {
+  'widget-appearance': {
+    reference: 8,
+    storageKey: 'screen_8',
+    group: 'Voice Widget setup',
     title: 'Widget appearance',
     caption: 'Match your website’s voice button and call window.',
     type: 'setup',
@@ -35,7 +41,10 @@ export const screens = {
       F('Launcher shape', 'select', ['Round', 'Pill']),
     ],
   },
-  9: {
+  'widget-greeting': {
+    reference: 9,
+    storageKey: 'screen_9',
+    group: 'Voice Widget setup',
     title: 'Greeting & caller details',
     caption: 'Decide what visitors hear and which details to collect.',
     type: 'setup',
@@ -49,7 +58,10 @@ export const screens = {
       F('Privacy notice URL', 'url'),
     ],
   },
-  10: {
+  'widget-handoff': {
+    reference: 10,
+    storageKey: 'screen_10',
+    group: 'Voice Widget setup',
     title: 'Human handoff',
     caption: 'Route human requests to the right department.',
     type: 'setup',
@@ -63,7 +75,10 @@ export const screens = {
     ],
     hints: ['The AI stops speaking after a human accepts the call.'],
   },
-  11: {
+  'widget-availability': {
+    reference: 11,
+    storageKey: 'screen_11',
+    group: 'Voice Widget setup',
     title: 'Website, hours & fallback',
     caption: 'Choose where the widget appears and what happens after hours.',
     type: 'setup',
@@ -78,7 +93,10 @@ export const screens = {
       F('When agents are unavailable', 'select', ['Offer callback', 'Keep AI answering']),
     ],
   },
-  12: {
+  'widget-publish': {
+    reference: 12,
+    storageKey: 'screen_12',
+    group: 'Voice Widget setup',
     title: 'Test, install & publish',
     caption: 'Review your widget before adding it to a website.',
     type: 'setup',
@@ -91,7 +109,10 @@ export const screens = {
       'Publishing does not initiate a phone call.',
     ],
   },
-  13: {
+  dashboard: {
+    reference: 13,
+    storageKey: 'screen_13',
+    group: 'Owner workspace',
     title: 'Voice Operations Overview',
     caption: 'Real-time voice requests, agent activity and team performance.',
     type: 'dashboard',
@@ -99,7 +120,10 @@ export const screens = {
     cta: 'Open incoming requests',
     metrics: ['Active AI calls', 'Waiting for human', 'Live human calls', 'Callback requests'],
   },
-  14: {
+  inbox: {
+    reference: 14,
+    storageKey: 'screen_14',
+    group: 'Owner workspace',
     title: 'Incoming voice requests',
     caption: 'Customers waiting for a member of your team.',
     type: 'list',
@@ -111,7 +135,10 @@ export const screens = {
       F('Department', 'select', ['Technical Support', 'Sales', 'Customer Support']),
     ],
   },
-  15: {
+  'live-calls': {
+    reference: 15,
+    storageKey: 'screen_15',
+    group: 'Owner workspace',
     title: 'Live call monitoring',
     caption: 'See current calls and listen after gaining the correct permission.',
     type: 'dashboard',
@@ -119,7 +146,10 @@ export const screens = {
     cta: 'Open call monitor',
     metrics: ['Live AI calls', 'Live human calls', 'Waiting for agent', 'Longest wait'],
   },
-  16: {
+  'call-takeover': {
+    reference: 16,
+    storageKey: 'screen_16',
+    group: 'Owner workspace',
     title: 'Owner call takeover',
     caption: 'Take responsibility for a waiting or active call.',
     type: 'call',
@@ -128,7 +158,10 @@ export const screens = {
     transition: 'human',
     fields: [F('Takeover note', 'textarea')],
   },
-  17: {
+  'call-history': {
+    reference: 17,
+    storageKey: 'screen_17',
+    group: 'Owner workspace',
     title: 'Call history & transcript',
     caption: 'Review completed calls, summaries and conversation events.',
     type: 'list',
@@ -136,7 +169,10 @@ export const screens = {
     cta: 'View call details',
     fields: [F('Search caller'), F('Date', 'date')],
   },
-  18: {
+  callbacks: {
+    reference: 18,
+    storageKey: 'screen_18',
+    group: 'Owner workspace',
     title: 'Callback requests',
     caption: 'Follow up with customers who could not connect to a person.',
     type: 'list',
@@ -150,7 +186,10 @@ export const screens = {
       F('Preferred time', 'datetime-local'),
     ],
   },
-  19: {
+  reviews: {
+    reference: 19,
+    storageKey: 'screen_19',
+    group: 'Owner workspace',
     title: 'Reviews & ratings',
     caption: 'Read caller feedback about voice conversations.',
     type: 'list',
@@ -161,7 +200,10 @@ export const screens = {
       F('Rating', 'select', ['All', '5 stars', '4 stars', '3 stars', '2 stars', '1 star']),
     ],
   },
-  20: {
+  transfers: {
+    reference: 20,
+    storageKey: 'screen_20',
+    group: 'Owner workspace',
     title: 'Transfers',
     caption: 'Track active transfers and receiving agent acceptance.',
     type: 'list',
@@ -171,7 +213,10 @@ export const screens = {
       F('Receiving department', 'select', ['Technical Support', 'Sales', 'Customer Support']),
     ],
   },
-  21: {
+  'agent-inbox': {
+    reference: 21,
+    storageKey: 'screen_21',
+    group: 'Human Agent workspace',
     title: 'Voice request inbox',
     caption: 'Human voice requests assigned to your department.',
     type: 'list',
@@ -179,7 +224,10 @@ export const screens = {
     cta: 'Review request',
     metrics: ['Waiting for you', 'My active calls', 'Completed today'],
   },
-  22: {
+  'incoming-call': {
+    reference: 22,
+    storageKey: 'screen_22',
+    group: 'Human Agent workspace',
     title: 'Incoming AI voice call',
     caption: 'A caller has asked the AI to connect with a human.',
     type: 'call',
@@ -187,7 +235,10 @@ export const screens = {
     cta: 'Review AI summary',
     hints: ['This notification is a handoff from the AI voice agent.'],
   },
-  23: {
+  'call-review': {
+    reference: 23,
+    storageKey: 'screen_23',
+    group: 'Human Agent workspace',
     title: 'AI summary & accept',
     caption: 'Read the reason for the call before joining.',
     type: 'call',
@@ -196,7 +247,10 @@ export const screens = {
     transition: 'human',
     fields: [F('Internal note', 'textarea')],
   },
-  24: {
+  'live-call': {
+    reference: 24,
+    storageKey: 'screen_24',
+    group: 'Human Agent workspace',
     title: 'Live human call console',
     caption: 'Speak with the caller after accepting the handoff.',
     type: 'call',
@@ -206,7 +260,10 @@ export const screens = {
     fields: [F('Private team note', 'textarea')],
     hints: ['AI voice responses are paused while the human handles this call.'],
   },
-  25: {
+  'transfer-call': {
+    reference: 25,
+    storageKey: 'screen_25',
+    group: 'Human Agent workspace',
     title: 'Transfer live call',
     caption: 'Send the conversation and AI context to another agent.',
     type: 'call',
@@ -219,7 +276,10 @@ export const screens = {
       F('Reason for transfer', 'textarea'),
     ],
   },
-  26: {
+  'accept-transfer': {
+    reference: 26,
+    storageKey: 'screen_26',
+    group: 'Human Agent workspace',
     title: 'Accept transfer',
     caption: 'Review the current agent’s note and take ownership.',
     type: 'call',
@@ -228,7 +288,10 @@ export const screens = {
     transition: 'human',
     fields: [F('Receiving agent name')],
   },
-  27: {
+  'call-outcome': {
+    reference: 27,
+    storageKey: 'screen_27',
+    group: 'Human Agent workspace',
     title: 'Post-call outcome',
     caption: 'Record the result after the caller hangs up.',
     type: 'setup',
@@ -240,7 +303,10 @@ export const screens = {
       F('Follow-up time', 'datetime-local'),
     ],
   },
-  28: {
+  'customer-call': {
+    reference: 28,
+    storageKey: 'screen_28',
+    group: 'Customer experience',
     title: 'Call Acme Support',
     caption: 'Start a voice conversation from the website.',
     type: 'customer',
@@ -248,7 +314,10 @@ export const screens = {
     cta: 'Allow microphone',
     mic: true,
   },
-  29: {
+  'ai-conversation': {
+    reference: 29,
+    storageKey: 'screen_29',
+    group: 'Customer experience',
     title: 'Talk with the AI voice agent',
     caption: 'Ask your question or request a human.',
     type: 'customer',
@@ -256,7 +325,10 @@ export const screens = {
     cta: 'Request a person',
     fields: [F('Your question', 'textarea')],
   },
-  30: {
+  connecting: {
+    reference: 30,
+    storageKey: 'screen_30',
+    group: 'Customer experience',
     title: 'Connecting you to a person',
     caption: 'The AI is looking for an available team member.',
     type: 'customer',
@@ -264,7 +336,10 @@ export const screens = {
     cta: 'Stay in queue',
     hints: ['The caller hears a waiting message while human agents are notified.'],
   },
-  31: {
+  'human-conversation': {
+    reference: 31,
+    storageKey: 'screen_31',
+    group: 'Customer experience',
     title: 'Human agent joined',
     caption: 'A team member is now handling your conversation.',
     type: 'customer',
@@ -272,7 +347,10 @@ export const screens = {
     cta: 'Continue call',
     hints: ['Your agent’s name is shown when they accept.'],
   },
-  32: {
+  'customer-callback': {
+    reference: 32,
+    storageKey: 'screen_32',
+    group: 'Customer experience',
     title: 'All agents are unavailable',
     caption: 'Leave your details and the team can call you back.',
     type: 'customer',
@@ -286,7 +364,10 @@ export const screens = {
       F('Preferred time', 'datetime-local'),
     ],
   },
-  33: {
+  'call-rating': {
+    reference: 33,
+    storageKey: 'screen_33',
+    group: 'Customer experience',
     title: 'Rate your call',
     caption: 'Help improve the voice support experience.',
     type: 'customer',
@@ -294,7 +375,10 @@ export const screens = {
     cta: 'Submit rating',
     fields: [F('Rating', 'select', ['5', '4', '3', '2', '1']), F('Your feedback', 'textarea')],
   },
-  34: {
+  'agent-instructions': {
+    reference: 34,
+    storageKey: 'screen_34',
+    group: 'Agent Studio & inbound',
     title: 'Agent instructions & prompt',
     caption: 'Define what the voice agent should do and how it should answer.',
     type: 'studio',
@@ -307,7 +391,10 @@ export const screens = {
       F('Variables', 'textarea'),
     ],
   },
-  35: {
+  'agent-knowledge': {
+    reference: 35,
+    storageKey: 'screen_35',
+    group: 'Agent Studio & inbound',
     title: 'Knowledge sources',
     caption: 'Manage the content your AI voice agent can use.',
     type: 'studio',
@@ -324,7 +411,10 @@ export const screens = {
       'Demo indexing stores only the text excerpt you provide. Website crawling and document processing require a retrieval service.',
     ],
   },
-  36: {
+  'agent-actions': {
+    reference: 36,
+    storageKey: 'screen_36',
+    group: 'Agent Studio & inbound',
     title: 'Actions & integrations',
     caption: 'Connect approved actions to your business systems.',
     type: 'studio',
@@ -339,7 +429,10 @@ export const screens = {
     ],
     hints: ['An enabled action will not execute until its endpoint and credentials are verified.'],
   },
-  37: {
+  'agent-advanced': {
+    reference: 37,
+    storageKey: 'screen_37',
+    group: 'Agent Studio & inbound',
     title: 'Advanced voice behaviour',
     caption: 'Tune turn-taking, interruptions and fallback language.',
     type: 'studio',
@@ -353,7 +446,10 @@ export const screens = {
       F('Fallback language', 'select', ['English (India)', 'Hindi', 'Telugu']),
     ],
   },
-  38: {
+  'agent-quality': {
+    reference: 38,
+    storageKey: 'screen_38',
+    group: 'Agent Studio & inbound',
     title: 'Call data & quality rules',
     caption: 'Choose which call fields and quality checks are stored.',
     type: 'studio',
@@ -370,7 +466,10 @@ export const screens = {
       'Recording and transcript retention need explicit privacy settings before live deployment.',
     ],
   },
-  39: {
+  'agent-versions': {
+    reference: 39,
+    storageKey: 'screen_39',
+    group: 'Agent Studio & inbound',
     title: 'Test, publish & versions',
     caption: 'Review agent changes before applying a published version.',
     type: 'studio',
@@ -379,7 +478,10 @@ export const screens = {
     fields: [F('Voice agent', 'agent'), F('Version note', 'textarea')],
     hints: ['A saved draft does not change the currently published voice agent.'],
   },
-  40: {
+  'inbound-routing': {
+    reference: 40,
+    storageKey: 'screen_40',
+    group: 'Agent Studio & inbound',
     title: 'Phone number & inbound routing',
     caption: 'Connect a business number and route inbound calls to an agent.',
     type: 'setup',
@@ -393,7 +495,10 @@ export const screens = {
       F('Human handoff department', 'select', ['Technical Support', 'Sales', 'Customer Support']),
     ],
   },
-  41: {
+  'agent-performance': {
+    reference: 41,
+    storageKey: 'screen_41',
+    group: 'Agent Studio & inbound',
     title: 'Voice agent performance',
     caption: 'See outcomes and trends for one voice agent.',
     type: 'dashboard',
@@ -401,7 +506,10 @@ export const screens = {
     cta: 'View call history',
     metrics: ['Total calls', 'Resolved by AI', 'Human handoffs', 'Callback requests'],
   },
-  42: {
+  'inbound-call': {
+    reference: 42,
+    storageKey: 'screen_42',
+    group: 'Agent Studio & inbound',
     title: 'Inbound phone call',
     caption: 'Callers reach the AI agent through the connected business number.',
     type: 'customer',
@@ -409,7 +517,10 @@ export const screens = {
     cta: 'View inbound route',
     hints: ['An active telephony provider is required for real inbound calls.'],
   },
-  43: {
+  campaigns: {
+    reference: 43,
+    storageKey: 'screen_43',
+    group: 'Outbound campaigns',
     title: 'Outbound campaigns',
     caption: 'Plan and monitor AI voice campaigns.',
     type: 'list',
@@ -417,7 +528,10 @@ export const screens = {
     cta: 'Create campaign',
     fields: [F('Campaign name'), F('Agent', 'agent')],
   },
-  44: {
+  'campaign-basics': {
+    reference: 44,
+    storageKey: 'screen_44',
+    group: 'Outbound campaigns',
     title: 'Campaign basics & agent',
     caption: 'Choose the purpose and voice agent for outbound calls.',
     type: 'campaign',
@@ -430,7 +544,10 @@ export const screens = {
       F('Opening script', 'textarea'),
     ],
   },
-  45: {
+  'campaign-contacts': {
+    reference: 45,
+    storageKey: 'screen_45',
+    group: 'Outbound campaigns',
     title: 'Contacts & eligibility',
     caption: 'Check opt-in, suppression and duplicates before dialing.',
     type: 'campaign',
@@ -443,7 +560,10 @@ export const screens = {
     ],
     hints: ['Real outbound dialing requires verified consent and suppression checks.'],
   },
-  46: {
+  'campaign-calling-settings': {
+    reference: 46,
+    storageKey: 'screen_46',
+    group: 'Outbound campaigns',
     title: 'Caller number & capacity',
     caption: 'Set the number shown to recipients and reserved inbound capacity.',
     type: 'campaign',
@@ -456,7 +576,10 @@ export const screens = {
       F('Calls per second', 'number'),
     ],
   },
-  47: {
+  'campaign-schedule': {
+    reference: 47,
+    storageKey: 'screen_47',
+    group: 'Outbound campaigns',
     title: 'Schedule, retries & voicemail',
     caption: 'Choose calling hours and safe retry settings.',
     type: 'campaign',
@@ -470,7 +593,10 @@ export const screens = {
       F('Voicemail action', 'select', ['Hang up', 'Leave approved short message']),
     ],
   },
-  48: {
+  'campaign-review': {
+    reference: 48,
+    storageKey: 'screen_48',
+    group: 'Outbound campaigns',
     title: 'Test, review & launch',
     caption: 'Check all campaign settings before starting calls.',
     type: 'campaign',
@@ -481,7 +607,10 @@ export const screens = {
       'Scheduling stores the campaign. Real outbound calls require a configured dialer and verified number.',
     ],
   },
-  49: {
+  'campaign-monitoring': {
+    reference: 49,
+    storageKey: 'screen_49',
+    group: 'Outbound campaigns',
     title: 'Live campaign monitoring',
     caption: 'Watch call results as an outbound campaign runs.',
     type: 'dashboard',
@@ -489,7 +618,10 @@ export const screens = {
     cta: 'View current calls',
     metrics: ['Eligible contacts', 'Calls initiated', 'Connected', 'Queued'],
   },
-  50: {
+  'outbound-handoff': {
+    reference: 50,
+    storageKey: 'screen_50',
+    group: 'Outbound campaigns',
     title: 'Outbound AI-to-human handoff',
     caption: 'Join an outbound call after the AI requests help.',
     type: 'call',
@@ -498,7 +630,10 @@ export const screens = {
     transition: 'human',
     fields: [F('Handoff note', 'textarea')],
   },
-  51: {
+  'campaign-results': {
+    reference: 51,
+    storageKey: 'screen_51',
+    group: 'Outbound campaigns',
     title: 'Campaign results & call outcomes',
     caption: 'Review completions, connection rates and follow-ups.',
     type: 'dashboard',

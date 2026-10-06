@@ -8,7 +8,7 @@
   frame.title = 'ChatBucket Voice Support';
   frame.src =
     host +
-    '/flow/28?widget=' +
+    '/customer/call?widget=' +
     encodeURIComponent(id) +
     '&origin=' +
     encodeURIComponent(location.origin);

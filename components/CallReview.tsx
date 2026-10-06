@@ -27,7 +27,7 @@ export default function CallReview({ records, selected, onSelect, onUpdate }) {
       if (!response.ok) throw Error(value.error);
       localStorage.setItem('chatbucket:call', call._id);
       await onUpdate();
-      router.push('/flow/24');
+      router.push('/agent/live-call');
     } catch (error) {
       setMessage(error.message);
     } finally {
@@ -113,7 +113,7 @@ export default function CallReview({ records, selected, onSelect, onUpdate }) {
               'review-call-center-title flex items-center gap-2.25 border-b border-b-[#42404c] pb-3.25 [&_a]:text-white [&_a]:border [&_a]:border-[#4c4a54] [&_a]:rounded-[7px] [&_a]:p-1.5 [&_a]:grid [&_a]:place-items-center [&_div]:flex-1 [&_h2]:m-0 [&_h2]:text-lg [&_p]:text-[#b4b7c6] [&_p]:text-[11px] [&_p]:m-[3px_0] [&>span]:text-[10px] [&>span]:text-[#ff6888] max-[700px]:[&>span]:hidden'
             }
           >
-            <Link href="/flow/21">
+            <Link href="/agent/inbox">
               <ArrowLeft size={17} />
             </Link>
             <div>
@@ -245,7 +245,7 @@ export default function CallReview({ records, selected, onSelect, onUpdate }) {
           className={
             'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
           }
-          href="/flow/21"
+          href="/agent/inbox"
         >
           Decline
         </Link>

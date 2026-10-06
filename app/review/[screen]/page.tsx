@@ -9,17 +9,21 @@ const first = [
   'Conversation rules',
   'Test & save',
 ];
-export default async function Review({ params }) {
+export default async function Review({ params, searchParams }) {
   const { screen } = await params;
   const number = Number(screen);
   if (!Number.isInteger(number) || number < 1 || number > 51) notFound();
-  const title = number <= 6 ? first[number - 1] : screens[number]?.title;
-  const route =
-    number === 1
-      ? '/voice-agents'
-      : number <= 6
-        ? `/voice-agents/new?step=${number - 2}`
-        : `/flow/${number}`;
+  const title =
+    number <= 6
+      ? first[number - 1]
+      : Object.values(screens).find((config) => config.reference === number)?.title;
+  const { path: route } = await searchParams;
+  if (
+    typeof route !== 'string' ||
+    !route.startsWith('/') ||
+    new URL(route, 'http://review.local').origin !== 'http://review.local'
+  )
+    notFound();
   return (
     <main
       className={
