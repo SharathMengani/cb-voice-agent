@@ -2,12 +2,345 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AudioLines, CalendarDays, ChevronRight, FileText, Headphones, Phone, Play, Plus, Search, Trophy, X } from 'lucide-react';
+import {
+  AudioLines,
+  CalendarDays,
+  ChevronRight,
+  FileText,
+  Headphones,
+  Phone,
+  Play,
+  Plus,
+  Search,
+  Trophy,
+  X,
+} from 'lucide-react';
 import { apiFetch } from './api-client';
 
-export default function CampaignList({records,agents,onUpdate}){
-  const router=useRouter();const [drawer,setDrawer]=useState(false);const [name,setName]=useState('');const [agent,setAgent]=useState('');const [purpose,setPurpose]=useState('');const [filter,setFilter]=useState('All');const [query,setQuery]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);
-  const visible=records.filter(row=>(filter==='All'||row.status.toLowerCase()===filter.toLowerCase())&&row.title.toLowerCase().includes(query.toLowerCase()));
-  async function create(){if(!name.trim())return setError('Enter a campaign name.');if(!agents.some(a=>a.name===agent&&a.status==='ready'))return setError('Select a ready voice agent.');setBusy(true);setError('');try{const response=await apiFetch('/api/records/campaign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:name.trim(),data:{screen_44:{'Campaign name':name.trim(),'Voice agent':agent,'Purpose':purpose}}})});const data=await response.json();if(!response.ok)throw Error(data.error||'Could not create campaign.');localStorage.setItem('chatbucket:campaign',data._id);await onUpdate();router.push('/flow/44')}catch(e){setError(e.message)}finally{setBusy(false)}}
-  return <div className={"campaign-list-screen [color:#f8f6ff] [max-width:1550px] [margin:auto]"}><div className={"campaign-list-heading [display:flex] [justify-content:space-between] [align-items:center] [gap:15px] [margin-bottom:25px] [&_h1]:[font-size:30px] [&_h1]:[letter-spacing:-.04em] [&_h1]:[margin:0_0_7px] [&_p]:[color:#adb2c4] [&_p]:[margin:0] [&>div]:[flex:1] max-[900px]:[flex-wrap:wrap]"}><div><h1>Outbound campaigns</h1><p>Call opted-in contacts with your AI voice agent.</p></div><Link className={"button secondary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} href="/voice-agents/new?step=4"><Phone size={17}/> Make one test call</Link><button className={"button primary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} onClick={()=>{setAgent(agents.find(a=>a.status==='ready')?.name||'');setName('');setPurpose('');setError('');setDrawer(true)}}><Plus size={18}/> Create campaign</button></div><div className={"campaign-summary [display:grid] [grid-template-columns:repeat(3,_1fr)] [gap:15px] [margin:30px_0] [&_article]:[border:1px_solid_#3d3b49] [&_article]:[background:#1e1e25] [&_article]:[border-radius:11px] [&_article]:[padding:20px] [&_article]:[display:flex] [&_article]:[gap:20px] [&_article]:[align-items:center] [&_article]:[min-height:100px] [&_article>span]:[background:#3b2e5b] [&_article>span]:[border-radius:10px] [&_article>span]:[color:#ad7bff] [&_article>span]:[width:54px] [&_article>span]:[height:54px] [&_article>span]:[display:grid] [&_article>span]:[place-items:center] [&_article_div]:[color:#bfc2cf] [&_article_div]:[font-size:13px] [&_strong]:[display:block] [&_strong]:[color:white] [&_strong]:[font-size:25px] [&_strong]:[margin-top:5px] [grid-template-columns:repeat(4,_1fr)] max-[900px]:[grid-template-columns:repeat(2,_1fr)]"}>{([['Draft','draft',FileText],['Scheduled','scheduled',CalendarDays],['Running','running',Play],['Completed','completed',Trophy]] as const).map(([label,status,Icon])=><article key={label}><span><Icon size={25}/></span><div>{label}<strong>{records.filter(r=>r.status===status).length}</strong></div></article>)}</div><div className={"campaign-filter-line [display:flex] [justify-content:space-between] [align-items:center] [gap:12px] [margin:30px_0_15px] [&_label]:[display:flex] [&_label]:[align-items:center] [&_label]:[gap:10px] [&_label]:[border:1px_solid_#41404b] [&_label]:[border-radius:9px] [&_label]:[padding:10px_14px] [&_label]:[color:#b9bfce] [&_input]:[background:transparent] [&_input]:[border:0] [&_input]:[color:#fff] [&_input]:[outline:0] [&_input]:[width:270px] [&_input]:[font:inherit] [&_input]:[font-size:12px] [&>div]:[display:flex] [&>div]:[gap:7px] [&>div]:[flex-wrap:wrap] [&_button]:[border:1px_solid_#343842] [&_button]:[background:#242830] [&_button]:[color:#bec1ce] [&_button]:[padding:10px_16px] [&_button]:[border-radius:30px] [&_button]:[cursor:pointer] [&_button.selected]:[background:#623de8] [&_button.selected]:[color:#fff] [&_button.selected]:[border-color:#643cf1] max-[900px]:[flex-wrap:wrap]"}><div>{['All','Draft','Scheduled','Running','Completed'].map(label=><button className={(filter===label?'selected':'')} key={label} onClick={()=>setFilter(label)}>{label}</button>)}</div><label><Search size={17}/><input placeholder="Search campaigns…" value={query} onChange={e=>setQuery(e.target.value)}/></label></div><div className={"campaign-list-table [border:1px_solid_#393945] [border-radius:12px] [background:#1d1e25] [overflow:hidden] max-[1250px]:[overflow-x:auto]"}><div className={"campaign-list-header [color:#bdc0cd] [font-size:12px] [background:#24242d] [display:grid] [grid-template-columns:2fr_.85fr_1.3fr_1fr_1fr_1.1fr] [align-items:center] [gap:8px] [padding:16px_14px] max-[1250px]:[min-width:960px]"}><span>Campaign</span><span>Status</span><span>Voice agent</span><span>Progress</span><span>Scheduled for</span><span>Actions</span></div>{visible.map(row=><div className={"campaign-list-row [border-top:1px_solid_#36363f] [color:#e7e5ed] [font-size:12px] [&_strong]:[display:block] [&_small]:[display:block] [&_small]:[color:#afb0c0] [&_small]:[font-size:11px] [&_small]:[margin-top:4px] [&>span:nth-child(3)]:[display:flex] [&>span:nth-child(3)]:[align-items:center] [&>span:nth-child(3)]:[gap:5px] [display:grid] [grid-template-columns:2fr_.85fr_1.3fr_1fr_1fr_1.1fr] [align-items:center] [gap:8px] [padding:16px_14px] [border-top:1px_solid_#363a42] [&>div>strong]:[font-size:13px] [&_.button]:[font-size:11px] [&_.button]:[padding:9px] [&_.button]:[white-space:nowrap] [&>span:nth-child(4)_strong]:[font-size:13px] max-[1250px]:[min-width:960px]"} key={row._id}><div><strong>{row.title}</strong><small>{row.data?.screen_44?.Purpose||'Outbound AI voice calls'}</small></div><span><em className={(`campaign-status [font-style:normal] [border-radius:20px] [padding:6px_10px] [font-size:11px] [white-space:nowrap] [&.completed]:[color:#48ddae] [&.completed]:[background:#193c36] [&.running]:[color:#48ddae] [&.running]:[background:#193c36] [&.draft]:[color:#ffd27d] [&.draft]:[background:#493a24] [&.scheduled]:[color:#84b9ff] [&.scheduled]:[background:#263a5c]${row.status}`)}>● {row.status}</em></span><span><Headphones size={16}/>{row.data?.screen_44?.['Voice agent']||'Select an agent'}</span><span><strong>{row.data?.stats?.initiated||0} / {row.data?.stats?.eligible||0}</strong><small>simulated contacts</small></span><span>{row.data?.screen_47?.['Start date and time']||'—'}</span><span><button className={"button secondary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} onClick={()=>{localStorage.setItem('chatbucket:campaign',row._id);router.push(row.status==='completed'?'/flow/51':row.status==='running'?'/flow/49':'/flow/44')}}>{['running','completed'].includes(row.status)?'View results':'Continue setup'} <ChevronRight size={15}/></button></span></div>)}{visible.length===0&&<p className={"widget-empty [padding:30px] [text-align:center] [color:#b5b5c4]"}>No campaigns in this filter.</p>}</div>{drawer&&<div className={"widget-drawer-backdrop [position:fixed] [inset:0] [background:rgba(0,_0,_0,_.52)] [z-index:110] [display:flex] [justify-content:flex-end]"} onClick={()=>setDrawer(false)}><aside className={"widget-create-drawer [width:min(530px,_100vw)] [height:100vh] [overflow:auto] [background:#211f28] [border-left:1px_solid_#4b435d] [padding:28px_24px_100px] [position:relative] [box-shadow:-20px_0_70px_#0008] [&_h3]:[margin-top:20px] [&>.field]:[margin:18px_0]"} onClick={e=>e.stopPropagation()} aria-label="Create campaign"><div className={"widget-drawer-heading [display:flex] [gap:14px] [justify-content:space-between] [&_h2]:[font-size:23px] [&_h2]:[margin:0_0_7px] [&_p]:[color:#bcbccb] [&_p]:[font-size:13px] [&_p]:[line-height:1.4] [&_p]:[margin:0] [&_button]:[height:30px] [&_button]:[background:none] [&_button]:[border:0] [&_button]:[color:#fff] [&_button]:[cursor:pointer]"}><div><h2>Create campaign</h2><p>Choose an AI voice agent and set your goal.</p></div><button onClick={()=>setDrawer(false)} aria-label="Close"><X size={20}/></button></div><div className={"widget-drawer-steps [display:flex] [justify-content:space-between] [gap:5px] [border-bottom:1px_solid_#48434c] [margin:25px_0] [padding-bottom:28px] [&_span]:[display:flex] [&_span]:[flex-direction:column] [&_span]:[align-items:center] [&_span]:[gap:7px] [&_span]:[text-align:center] [&_span]:[min-width:0] [&_span]:[flex:1] [&_span]:[color:#b4b0c4] [&_span]:[font-size:10px] [&_b]:[border:1px_solid_#636272] [&_b]:[width:30px] [&_b]:[height:30px] [&_b]:[display:grid] [&_b]:[place-items:center] [&_b]:[border-radius:50%] [&_b]:[font-size:12px] [&_b.current]:[background:#6740df] [&_b.current]:[border:0] [&_b.current]:[color:#fff]"}>{['Basics','Contacts','Capacity','Schedule','Review'].map((label,i)=><span key={label}><b className={(i===0?'current':'')}>{i+1}</b>{label}</span>)}</div><div className={"field-stack [display:grid] [gap:19px]"}><label className={"field [display:grid] [gap:8px] [font-size:14px] [&_input]:[width:100%] [&_input]:[border-radius:8px] [&_input]:[border:1px_solid_#454551] [&_input]:[background:#202128] [&_input]:[padding:12px_13px] [&_input]:[color:#f5f5f8] [&_input]:[outline:0] [&_input]:[font-size:14px] [&_textarea]:[width:100%] [&_textarea]:[border-radius:8px] [&_textarea]:[border:1px_solid_#454551] [&_textarea]:[background:#202128] [&_textarea]:[padding:12px_13px] [&_textarea]:[color:#f5f5f8] [&_textarea]:[outline:0] [&_textarea]:[font-size:14px] [&_select]:[width:100%] [&_select]:[border-radius:8px] [&_select]:[border:1px_solid_#454551] [&_select]:[background:#202128] [&_select]:[padding:12px_13px] [&_select]:[color:#f5f5f8] [&_select]:[outline:0] [&_select]:[font-size:14px] [&_textarea]:[resize:vertical] [&_textarea]:[line-height:1.5] [&_input:focus]:[border-color:#a47aff] [&_input:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_textarea:focus]:[border-color:#a47aff] [&_textarea:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_select:focus]:[border-color:#a47aff] [&_select:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_small]:[color:var(--muted)] [&_small]:[font-size:12px]"}><span className={"field-label [color:#f0eff5] [font-weight:540]"}>Campaign name</span><input value={name} onChange={e=>setName(e.target.value)} placeholder="Customer follow-up campaign"/></label><label className={"field [display:grid] [gap:8px] [font-size:14px] [&_input]:[width:100%] [&_input]:[border-radius:8px] [&_input]:[border:1px_solid_#454551] [&_input]:[background:#202128] [&_input]:[padding:12px_13px] [&_input]:[color:#f5f5f8] [&_input]:[outline:0] [&_input]:[font-size:14px] [&_textarea]:[width:100%] [&_textarea]:[border-radius:8px] [&_textarea]:[border:1px_solid_#454551] [&_textarea]:[background:#202128] [&_textarea]:[padding:12px_13px] [&_textarea]:[color:#f5f5f8] [&_textarea]:[outline:0] [&_textarea]:[font-size:14px] [&_select]:[width:100%] [&_select]:[border-radius:8px] [&_select]:[border:1px_solid_#454551] [&_select]:[background:#202128] [&_select]:[padding:12px_13px] [&_select]:[color:#f5f5f8] [&_select]:[outline:0] [&_select]:[font-size:14px] [&_textarea]:[resize:vertical] [&_textarea]:[line-height:1.5] [&_input:focus]:[border-color:#a47aff] [&_input:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_textarea:focus]:[border-color:#a47aff] [&_textarea:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_select:focus]:[border-color:#a47aff] [&_select:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_small]:[color:var(--muted)] [&_small]:[font-size:12px]"}><span className={"field-label [color:#f0eff5] [font-weight:540]"}>Purpose</span><textarea value={purpose} onChange={e=>setPurpose(e.target.value)} placeholder="What is the reason for calling?"/></label><label className={"field [display:grid] [gap:8px] [font-size:14px] [&_input]:[width:100%] [&_input]:[border-radius:8px] [&_input]:[border:1px_solid_#454551] [&_input]:[background:#202128] [&_input]:[padding:12px_13px] [&_input]:[color:#f5f5f8] [&_input]:[outline:0] [&_input]:[font-size:14px] [&_textarea]:[width:100%] [&_textarea]:[border-radius:8px] [&_textarea]:[border:1px_solid_#454551] [&_textarea]:[background:#202128] [&_textarea]:[padding:12px_13px] [&_textarea]:[color:#f5f5f8] [&_textarea]:[outline:0] [&_textarea]:[font-size:14px] [&_select]:[width:100%] [&_select]:[border-radius:8px] [&_select]:[border:1px_solid_#454551] [&_select]:[background:#202128] [&_select]:[padding:12px_13px] [&_select]:[color:#f5f5f8] [&_select]:[outline:0] [&_select]:[font-size:14px] [&_textarea]:[resize:vertical] [&_textarea]:[line-height:1.5] [&_input:focus]:[border-color:#a47aff] [&_input:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_textarea:focus]:[border-color:#a47aff] [&_textarea:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_select:focus]:[border-color:#a47aff] [&_select:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_small]:[color:var(--muted)] [&_small]:[font-size:12px]"}><span className={"field-label [color:#f0eff5] [font-weight:540]"}>Voice agent</span><select value={agent} onChange={e=>setAgent(e.target.value)}><option value="">Select a ready agent</option>{agents.filter(a=>a.status==='ready').map(a=><option key={a._id}>{a.name}</option>)}</select></label></div><p className={"widget-drawer-info [border:1px_solid_#44414d] [background:#302e38] [border-radius:8px] [padding:13px] [color:#c3c4d0] [font-size:12px] [display:flex] [align-items:center] [gap:10px]"}>The demo does not place real calls. Consent and contact checks follow in the next steps.</p>{error&&<p className={"flow-alert problem [display:flex] [gap:10px] [align-items:center] [background:#173b34] [border:1px_solid_#296a55] [color:#81e4b8] [padding:13px_16px] [border-radius:9px] [margin:15px_0] [font-size:14px] [&.problem]:[background:#402630] [&.problem]:[border-color:#a44c68] [&.problem]:[color:#ffb5c1]"} role="status">{error}</p>}<div className={"widget-drawer-footer [position:sticky] [bottom:-100px] [background:#211f28] [padding:18px_0] [display:flex] [gap:9px] [justify-content:flex-end] [border-top:1px_solid_#45424a] [margin-top:35px]"}><button className={"button secondary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} onClick={()=>setDrawer(false)}>Cancel</button><button className={"button primary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} disabled={busy} onClick={create}>Continue to contacts <ChevronRight size={16}/></button></div></aside></div>}</div>;
+export default function CampaignList({ records, agents, onUpdate }) {
+  const router = useRouter();
+  const [drawer, setDrawer] = useState(false);
+  const [name, setName] = useState('');
+  const [agent, setAgent] = useState('');
+  const [purpose, setPurpose] = useState('');
+  const [filter, setFilter] = useState('All');
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const visible = records.filter(
+    (row) =>
+      (filter === 'All' || row.status.toLowerCase() === filter.toLowerCase()) &&
+      row.title.toLowerCase().includes(query.toLowerCase()),
+  );
+  async function create() {
+    if (!name.trim()) return setError('Enter a campaign name.');
+    if (!agents.some((a) => a.name === agent && a.status === 'ready'))
+      return setError('Select a ready voice agent.');
+    setBusy(true);
+    setError('');
+    try {
+      const response = await apiFetch('/api/records/campaign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: name.trim(),
+          data: {
+            screen_44: { 'Campaign name': name.trim(), 'Voice agent': agent, Purpose: purpose },
+          },
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || 'Could not create campaign.');
+      localStorage.setItem('chatbucket:campaign', data._id);
+      await onUpdate();
+      router.push('/flow/44');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className={'campaign-list-screen text-[#f8f6ff] max-w-387.5 m-auto'}>
+      <div
+        className={
+          'campaign-list-heading flex justify-between items-center gap-3.75 mb-6.25 [&_h1]:text-3xl [&_h1]:tracking-[-.04em] [&_h1]:m-[0_0_7px] [&_p]:text-[#adb2c4] [&_p]:m-0 [&>div]:flex-1 max-[900px]:flex-wrap'
+        }
+      >
+        <div>
+          <h1>Outbound campaigns</h1>
+          <p>Call opted-in contacts with your AI voice agent.</p>
+        </div>
+        <Link
+          className={
+            'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+          }
+          href="/voice-agents/new?step=4"
+        >
+          <Phone size={17} /> Make one test call
+        </Link>
+        <button
+          className={
+            'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+          }
+          onClick={() => {
+            setAgent(agents.find((a) => a.status === 'ready')?.name || '');
+            setName('');
+            setPurpose('');
+            setError('');
+            setDrawer(true);
+          }}
+        >
+          <Plus size={18} /> Create campaign
+        </button>
+      </div>
+      <div
+        className={
+          'campaign-summary grid grid-cols-[repeat(3,1fr)] gap-3.75 m-[30px_0] [&_article]:border [&_article]:border-[#3d3b49] [&_article]:bg-[#1e1e25] [&_article]:rounded-[11px] [&_article]:p-5 [&_article]:flex [&_article]:gap-5 [&_article]:items-center [&_article]:min-h-25 [&_article>span]:bg-[#3b2e5b] [&_article>span]:rounded-[10px] [&_article>span]:text-[#ad7bff] [&_article>span]:w-13.5 [&_article>span]:h-13.5 [&_article>span]:grid [&_article>span]:place-items-center [&_article_div]:text-[#bfc2cf] [&_article_div]:text-[13px] [&_strong]:block [&_strong]:text-white [&_strong]:text-[25px] [&_strong]:mt-1.25 grid-cols-[repeat(4,1fr)] max-[900px]:grid-cols-[repeat(2,1fr)]'
+        }
+      >
+        {(
+          [
+            ['Draft', 'draft', FileText],
+            ['Scheduled', 'scheduled', CalendarDays],
+            ['Running', 'running', Play],
+            ['Completed', 'completed', Trophy],
+          ] as const
+        ).map(([label, status, Icon]) => (
+          <article key={label}>
+            <span>
+              <Icon size={25} />
+            </span>
+            <div>
+              {label}
+              <strong>{records.filter((r) => r.status === status).length}</strong>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div
+        className={
+          'campaign-filter-line flex justify-between items-center gap-3 m-[30px_0_15px] [&_label]:flex [&_label]:items-center [&_label]:gap-2.5 [&_label]:border [&_label]:border-[#41404b] [&_label]:rounded-[9px] [&_label]:p-[10px_14px] [&_label]:text-[#b9bfce] [&_input]:bg-transparent [&_input]:border-0 [&_input]:text-white [&_input]:outline-0 [&_input]:w-67.5 [&_input]:[font:inherit] [&_input]:text-xs [&>div]:flex [&>div]:gap-1.75 [&>div]:flex-wrap [&_button]:border [&_button]:border-[#343842] [&_button]:bg-[#242830] [&_button]:text-[#bec1ce] [&_button]:p-[10px_16px] [&_button]:rounded-[30px] [&_button]:cursor-pointer [&_button.selected]:bg-[#623de8] [&_button.selected]:text-white [&_button.selected]:border-[#643cf1] max-[900px]:flex-wrap'
+        }
+      >
+        <div>
+          {['All', 'Draft', 'Scheduled', 'Running', 'Completed'].map((label) => (
+            <button
+              className={filter === label ? 'selected' : ''}
+              key={label}
+              onClick={() => setFilter(label)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <label>
+          <Search size={17} />
+          <input
+            placeholder="Search campaigns…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+      </div>
+      <div
+        className={
+          'campaign-list-table border border-[#393945] rounded-xl bg-[#1d1e25] overflow-hidden max-[1250px]:overflow-x-auto'
+        }
+      >
+        <div
+          className={
+            'campaign-list-header text-[#bdc0cd] text-xs bg-[#24242d] grid grid-cols-[2fr_.85fr_1.3fr_1fr_1fr_1.1fr] items-center gap-2 p-[16px_14px] max-[1250px]:min-w-240'
+          }
+        >
+          <span>Campaign</span>
+          <span>Status</span>
+          <span>Voice agent</span>
+          <span>Progress</span>
+          <span>Scheduled for</span>
+          <span>Actions</span>
+        </div>
+        {visible.map((row) => (
+          <div
+            className={
+              'campaign-list-row border-t border-t-[#36363f] text-[#e7e5ed] text-xs [&_strong]:block [&_small]:block [&_small]:text-[#afb0c0] [&_small]:text-[11px] [&_small]:mt-1 [&>span:nth-child(3)]:flex [&>span:nth-child(3)]:items-center [&>span:nth-child(3)]:gap-1.25 grid grid-cols-[2fr_.85fr_1.3fr_1fr_1fr_1.1fr] items-center gap-2 p-[16px_14px] border-t border-t-[#363a42] [&>div>strong]:text-[13px] [&_.button]:text-[11px] [&_.button]:p-2.25 [&_.button]:whitespace-nowrap [&>span:nth-child(4)_strong]:text-[13px] max-[1250px]:min-w-240'
+            }
+            key={row._id}
+          >
+            <div>
+              <strong>{row.title}</strong>
+              <small>{row.data?.screen_44?.Purpose || 'Outbound AI voice calls'}</small>
+            </div>
+            <span>
+              <em
+                className={`campaign-status not-italic rounded-[20px] p-[6px_10px] text-[11px] whitespace-nowrap [&.completed]:text-[#48ddae] [&.completed]:bg-[#193c36] [&.running]:text-[#48ddae] [&.running]:bg-[#193c36] [&.draft]:text-[#ffd27d] [&.draft]:bg-[#493a24] [&.scheduled]:text-[#84b9ff] [&.scheduled]:bg-[#263a5c]${row.status}`}
+              >
+                ● {row.status}
+              </em>
+            </span>
+            <span>
+              <Headphones size={16} />
+              {row.data?.screen_44?.['Voice agent'] || 'Select an agent'}
+            </span>
+            <span>
+              <strong>
+                {row.data?.stats?.initiated || 0} / {row.data?.stats?.eligible || 0}
+              </strong>
+              <small>simulated contacts</small>
+            </span>
+            <span>{row.data?.screen_47?.['Start date and time'] || '—'}</span>
+            <span>
+              <button
+                className={
+                  'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+                }
+                onClick={() => {
+                  localStorage.setItem('chatbucket:campaign', row._id);
+                  router.push(
+                    row.status === 'completed'
+                      ? '/flow/51'
+                      : row.status === 'running'
+                        ? '/flow/49'
+                        : '/flow/44',
+                  );
+                }}
+              >
+                {['running', 'completed'].includes(row.status) ? 'View results' : 'Continue setup'}{' '}
+                <ChevronRight size={15} />
+              </button>
+            </span>
+          </div>
+        ))}
+        {visible.length === 0 && (
+          <p className={'widget-empty p-7.5 text-center text-[#b5b5c4]'}>
+            No campaigns in this filter.
+          </p>
+        )}
+      </div>
+      {drawer && (
+        <div
+          className={
+            'widget-drawer-backdrop fixed inset-0 bg-[rgba(0,0,0,.52)] z-110 flex justify-end'
+          }
+          onClick={() => setDrawer(false)}
+        >
+          <aside
+            className={
+              'widget-create-drawer w-[min(530px,100vw)] h-screen overflow-auto bg-[#211f28] border-l border-l-[#4b435d] p-[28px_24px_100px] relative shadow-[-20px_0_70px_#0008] [&_h3]:mt-5 [&>.field]:m-[18px_0]'
+            }
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Create campaign"
+          >
+            <div
+              className={
+                'widget-drawer-heading flex gap-3.5 justify-between [&_h2]:text-[23px] [&_h2]:m-[0_0_7px] [&_p]:text-[#bcbccb] [&_p]:text-[13px] [&_p]:leading-[1.4] [&_p]:m-0 [&_button]:h-7.5 [&_button]:bg-none [&_button]:border-0 [&_button]:text-white [&_button]:cursor-pointer'
+              }
+            >
+              <div>
+                <h2>Create campaign</h2>
+                <p>Choose an AI voice agent and set your goal.</p>
+              </div>
+              <button onClick={() => setDrawer(false)} aria-label="Close">
+                <X size={20} />
+              </button>
+            </div>
+            <div
+              className={
+                'widget-drawer-steps flex justify-between gap-1.25 border-b border-b-[#48434c] m-[25px_0] pb-7 [&_span]:flex [&_span]:flex-col [&_span]:items-center [&_span]:gap-1.75 [&_span]:text-center [&_span]:min-w-0 [&_span]:flex-1 [&_span]:text-[#b4b0c4] [&_span]:text-[10px] [&_b]:border [&_b]:border-[#636272] [&_b]:w-7.5 [&_b]:h-7.5 [&_b]:grid [&_b]:place-items-center [&_b]:rounded-full [&_b]:text-xs [&_b.current]:bg-[#6740df] [&_b.current]:border-0 [&_b.current]:text-white'
+              }
+            >
+              {['Basics', 'Contacts', 'Capacity', 'Schedule', 'Review'].map((label, i) => (
+                <span key={label}>
+                  <b className={i === 0 ? 'current' : ''}>{i + 1}</b>
+                  {label}
+                </span>
+              ))}
+            </div>
+            <div className={'field-stack grid gap-4.75'}>
+              <label
+                className={
+                  'field grid gap-2 text-sm [&_input]:w-full [&_input]:rounded-lg [&_input]:border [&_input]:border-[#454551] [&_input]:bg-[#202128] [&_input]:p-[12px_13px] [&_input]:text-[#f5f5f8] [&_input]:outline-0 [&_input]:text-sm [&_textarea]:w-full [&_textarea]:rounded-lg [&_textarea]:border [&_textarea]:border-[#454551] [&_textarea]:bg-[#202128] [&_textarea]:p-[12px_13px] [&_textarea]:text-[#f5f5f8] [&_textarea]:outline-0 [&_textarea]:text-sm [&_select]:w-full [&_select]:rounded-lg [&_select]:border [&_select]:border-[#454551] [&_select]:bg-[#202128] [&_select]:p-[12px_13px] [&_select]:text-[#f5f5f8] [&_select]:outline-0 [&_select]:text-sm [&_textarea]:resize-y [&_textarea]:leading-normal [&_input:focus]:border-[#a47aff] [&_input:focus]:shadow-[0_0_0_3px_#7646e323] [&_textarea:focus]:border-[#a47aff] [&_textarea:focus]:shadow-[0_0_0_3px_#7646e323] [&_select:focus]:border-[#a47aff] [&_select:focus]:shadow-[0_0_0_3px_#7646e323] [&_small]:text-(--muted) [&_small]:text-xs'
+                }
+              >
+                <span className={'field-label text-[#f0eff5] font-[540]'}>Campaign name</span>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Customer follow-up campaign"
+                />
+              </label>
+              <label
+                className={
+                  'field grid gap-2 text-sm [&_input]:w-full [&_input]:rounded-lg [&_input]:border [&_input]:border-[#454551] [&_input]:bg-[#202128] [&_input]:p-[12px_13px] [&_input]:text-[#f5f5f8] [&_input]:outline-0 [&_input]:text-sm [&_textarea]:w-full [&_textarea]:rounded-lg [&_textarea]:border [&_textarea]:border-[#454551] [&_textarea]:bg-[#202128] [&_textarea]:p-[12px_13px] [&_textarea]:text-[#f5f5f8] [&_textarea]:outline-0 [&_textarea]:text-sm [&_select]:w-full [&_select]:rounded-lg [&_select]:border [&_select]:border-[#454551] [&_select]:bg-[#202128] [&_select]:p-[12px_13px] [&_select]:text-[#f5f5f8] [&_select]:outline-0 [&_select]:text-sm [&_textarea]:resize-y [&_textarea]:leading-normal [&_input:focus]:border-[#a47aff] [&_input:focus]:shadow-[0_0_0_3px_#7646e323] [&_textarea:focus]:border-[#a47aff] [&_textarea:focus]:shadow-[0_0_0_3px_#7646e323] [&_select:focus]:border-[#a47aff] [&_select:focus]:shadow-[0_0_0_3px_#7646e323] [&_small]:text-(--muted) [&_small]:text-xs'
+                }
+              >
+                <span className={'field-label text-[#f0eff5] font-[540]'}>Purpose</span>
+                <textarea
+                  value={purpose}
+                  onChange={(e) => setPurpose(e.target.value)}
+                  placeholder="What is the reason for calling?"
+                />
+              </label>
+              <label
+                className={
+                  'field grid gap-2 text-sm [&_input]:w-full [&_input]:rounded-lg [&_input]:border [&_input]:border-[#454551] [&_input]:bg-[#202128] [&_input]:p-[12px_13px] [&_input]:text-[#f5f5f8] [&_input]:outline-0 [&_input]:text-sm [&_textarea]:w-full [&_textarea]:rounded-lg [&_textarea]:border [&_textarea]:border-[#454551] [&_textarea]:bg-[#202128] [&_textarea]:p-[12px_13px] [&_textarea]:text-[#f5f5f8] [&_textarea]:outline-0 [&_textarea]:text-sm [&_select]:w-full [&_select]:rounded-lg [&_select]:border [&_select]:border-[#454551] [&_select]:bg-[#202128] [&_select]:p-[12px_13px] [&_select]:text-[#f5f5f8] [&_select]:outline-0 [&_select]:text-sm [&_textarea]:resize-y [&_textarea]:leading-normal [&_input:focus]:border-[#a47aff] [&_input:focus]:shadow-[0_0_0_3px_#7646e323] [&_textarea:focus]:border-[#a47aff] [&_textarea:focus]:shadow-[0_0_0_3px_#7646e323] [&_select:focus]:border-[#a47aff] [&_select:focus]:shadow-[0_0_0_3px_#7646e323] [&_small]:text-(--muted) [&_small]:text-xs'
+                }
+              >
+                <span className={'field-label text-[#f0eff5] font-[540]'}>Voice agent</span>
+                <select value={agent} onChange={(e) => setAgent(e.target.value)}>
+                  <option value="">Select a ready agent</option>
+                  {agents
+                    .filter((a) => a.status === 'ready')
+                    .map((a) => (
+                      <option key={a._id}>{a.name}</option>
+                    ))}
+                </select>
+              </label>
+            </div>
+            <p
+              className={
+                'widget-drawer-info border border-[#44414d] bg-[#302e38] rounded-lg p-3.25 text-[#c3c4d0] text-xs flex items-center gap-2.5'
+              }
+            >
+              The demo does not place real calls. Consent and contact checks follow in the next
+              steps.
+            </p>
+            {error && (
+              <p
+                className={
+                  'flow-alert problem flex gap-2.5 items-center bg-[#173b34] border border-[#296a55] text-[#81e4b8] p-[13px_16px] rounded-[9px] m-[15px_0] text-sm [&.problem]:bg-[#402630] [&.problem]:border-[#a44c68] [&.problem]:text-[#ffb5c1]'
+                }
+                role="status"
+              >
+                {error}
+              </p>
+            )}
+            <div
+              className={
+                'widget-drawer-footer sticky -bottom-25 bg-[#211f28] p-[18px_0] flex gap-2.25 justify-end border-t border-t-[#45424a] mt-8.75'
+              }
+            >
+              <button
+                className={
+                  'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+                }
+                onClick={() => setDrawer(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={
+                  'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+                }
+                disabled={busy}
+                onClick={create}
+              >
+                Continue to contacts <ChevronRight size={16} />
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+    </div>
+  );
 }

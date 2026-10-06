@@ -1,2 +1,4 @@
-import {TeamDirectory} from '../../components/TeamPages';
-export default function Page(){return <TeamDirectory/>}
+import { TeamDirectory } from '../../components/TeamPages';
+export default function Page() {
+  return <TeamDirectory />;
+}

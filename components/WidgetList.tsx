@@ -2,13 +2,343 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Activity, AudioLines, Check, ChevronRight, Code2, Edit3, ExternalLink, Headphones, Info, Plus, Search, X } from 'lucide-react';
+import {
+  Activity,
+  AudioLines,
+  Check,
+  ChevronRight,
+  Code2,
+  Edit3,
+  ExternalLink,
+  Headphones,
+  Info,
+  Plus,
+  Search,
+  X,
+} from 'lucide-react';
 import { apiFetch } from './api-client';
 
-export default function WidgetList({records,agents,onUpdate}){
-  const router=useRouter();const [open,setOpen]=useState(false);const [name,setName]=useState('');const [agentId,setAgentId]=useState('');const [query,setQuery]=useState('');const [filter,setFilter]=useState('All');const [error,setError]=useState('');const [busy,setBusy]=useState(false);
-  const visible=records.filter(r=>(filter==='All'||r.status===(filter==='Live'?'published':'draft'))&&`${r.title} ${r.data?.screen_7?.['Voice agent']||''}`.toLowerCase().includes(query.toLowerCase()));
-  function openNew(){setName('');setAgentId(agents.find(agent=>agent.status==='ready')?._id||'');setError('');setOpen(true)}
-  async function create(){const agent=agents.find(item=>item._id===agentId);if(!name.trim())return setError('Enter a widget name.');if(!agent||agent.status!=='ready')return setError('Select a saved, ready voice agent.');setBusy(true);setError('');try{const response=await apiFetch('/api/records/widget',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:name.trim(),data:{screen_7:{'Widget name':name.trim(),'Voice agent':agent.name}}})});const data=await response.json();if(!response.ok)throw Error(data.error||'Could not create widget.');localStorage.setItem('chatbucket:widget',data._id);await onUpdate();router.push('/flow/8')}catch(e){setError(e.message)}finally{setBusy(false)}}
-  return <div className={"widget-list-screen [color:#f8f6ff] [max-width:1550px] [margin:auto]"}><div className="widget-main-list"><div className={"widget-list-title [display:flex] [justify-content:space-between] [align-items:center] [gap:15px] [margin-bottom:25px] [&_h1]:[font-size:30px] [&_h1]:[letter-spacing:-.04em] [&_h1]:[margin:0_0_7px] [&_p]:[color:#adb2c4] [&_p]:[margin:0] max-[900px]:[flex-wrap:wrap]"}><div><h1>Voice Widgets</h1><p>Put voice conversations on your website.</p></div><button className={"button primary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} onClick={openNew}><Plus size={18}/> Create widget</button></div><div className={"widget-summary-cards [display:grid] [grid-template-columns:repeat(3,_1fr)] [gap:15px] [margin:30px_0] max-[900px]:[grid-template-columns:repeat(2,_1fr)]"}>{[['Live',records.filter(r=>r.status==='published').length,AudioLines],['Draft',records.filter(r=>r.status==='draft').length,Code2],['Calls this week','Demo',Activity]].map(([label,value,Icon])=><div className={"widget-summary-card [border:1px_solid_#3d3b49] [background:#1e1e25] [border-radius:11px] [padding:20px] [display:flex] [gap:20px] [align-items:center] [min-height:100px] [&>span]:[background:#3b2e5b] [&>span]:[border-radius:10px] [&>span]:[color:#ad7bff] [&>span]:[width:54px] [&>span]:[height:54px] [&>span]:[display:grid] [&>span]:[place-items:center] [&_div]:[color:#bfc2cf] [&_div]:[font-size:13px] [&_strong]:[display:block] [&_strong]:[color:white] [&_strong]:[font-size:25px] [&_strong]:[margin-top:5px]"} key={label}><span><Icon size={27}/></span><div>{label}<strong>{value}</strong></div></div>)}</div><div className={"widget-list-tools [display:flex] [justify-content:space-between] [align-items:center] [gap:12px] [margin:30px_0_15px] [&_label]:[display:flex] [&_label]:[align-items:center] [&_label]:[gap:10px] [&_label]:[border:1px_solid_#41404b] [&_label]:[border-radius:9px] [&_label]:[padding:10px_14px] [&_label]:[color:#b9bfce] [&_input]:[background:transparent] [&_input]:[border:0] [&_input]:[color:#fff] [&_input]:[outline:0] [&_input]:[width:270px] [&_input]:[font:inherit] [&_input]:[font-size:12px] [&_select]:[background:#23232b] [&_select]:[color:white] [&_select]:[border:1px_solid_#44434e] [&_select]:[border-radius:8px] [&_select]:[padding:11px] max-[900px]:[flex-wrap:wrap]"}><label><Search size={19}/><input placeholder="Search voice widgets…" value={query} onChange={e=>setQuery(e.target.value)}/></label><select value={filter} onChange={e=>setFilter(e.target.value)} aria-label="Filter widgets by status"><option>All</option><option>Live</option><option>Draft</option></select></div><div className={"widget-table [border:1px_solid_#393945] [border-radius:12px] [background:#1d1e25] [overflow:hidden] max-[1250px]:[overflow-x:auto]"}><div className={"widget-table-head [display:grid] [grid-template-columns:2fr_1.25fr_1.55fr_.7fr_1fr_.7fr] [align-items:center] [gap:8px] [padding:17px_15px] [color:#bdc0cd] [font-size:12px] [background:#24242d] max-[1250px]:[min-width:910px]"}><span>Widget</span><span>Website</span><span>Connected agent</span><span>Status</span><span>Last activity</span><span>Actions</span></div>{visible.map(item=><div className={"widget-table-row [display:grid] [grid-template-columns:2fr_1.25fr_1.55fr_.7fr_1fr_.7fr] [align-items:center] [gap:8px] [padding:17px_15px] [border-top:1px_solid_#36363f] [color:#e7e5ed] [font-size:12px] [&>span:nth-child(3)]:[display:flex] [&>span:nth-child(3)]:[align-items:center] [&>span:nth-child(3)]:[gap:5px] [&_em]:[font-style:normal] [&_em]:[border-radius:20px] [&_em]:[padding:6px_10px] [&_em]:[font-size:11px] [&_em]:[white-space:nowrap] [&_em.live]:[color:#48ddae] [&_em.live]:[background:#193c36] [&_em.draft]:[color:#ffd27d] [&_em.draft]:[background:#493a24] [&_button]:[display:inline-flex] [&_button]:[align-items:center] [&_button]:[gap:5px] [&_button]:[background:#282832] [&_button]:[color:#fff] [&_button]:[border:1px_solid_#454552] [&_button]:[border-radius:7px] [&_button]:[padding:8px] [&_button]:[cursor:pointer] [&_button]:[font-size:11px] max-[1250px]:[min-width:910px]"} key={item._id}><span className={"widget-cell-name [display:flex] [align-items:center] [gap:10px] [&>span:last-child]:[min-width:0] [&_strong]:[display:block] [&_small]:[display:block] [&_small]:[color:#afb0c0] [&_small]:[font-size:11px] [&_small]:[margin-top:4px]"}><span className={"widget-cell-icon [width:44px] [height:44px] [flex-shrink:0] [display:grid] [place-items:center] [border-radius:7px] [color:#a773ff] [background:#34294f]"}><AudioLines size={23}/></span><span><strong>{item.title}</strong><small>Voice support on your website</small></span></span><span>{item.data?.screen_11?.['Allowed website URL']||'Not set'}</span><span><Headphones size={18}/>{item.data?.screen_7?.['Voice agent']||'Choose agent'}</span><span><em className={(item.status==='published'?'live':'draft')}>● {item.status==='published'?'Live':'Draft'}</em></span><span>{new Date(item.updatedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span><span><button onClick={()=>{localStorage.setItem('chatbucket:widget',item._id);router.push('/flow/8')}}><Edit3 size={15}/> Edit</button></span></div>)}{visible.length===0&&<p className={"widget-empty [padding:30px] [text-align:center] [color:#b5b5c4]"}>No widgets match this search. Create a voice widget to continue.</p>}</div></div>{open&&<div className={"widget-drawer-backdrop [position:fixed] [inset:0] [background:rgba(0,_0,_0,_.52)] [z-index:110] [display:flex] [justify-content:flex-end]"} onClick={()=>setOpen(false)}><aside className={"widget-create-drawer [width:min(530px,_100vw)] [height:100vh] [overflow:auto] [background:#211f28] [border-left:1px_solid_#4b435d] [padding:28px_24px_100px] [position:relative] [box-shadow:-20px_0_70px_#0008] [&_h3]:[margin-top:20px] [&>.field]:[margin:18px_0]"} onClick={e=>e.stopPropagation()} aria-label="Create Voice Widget"><div className={"widget-drawer-heading [display:flex] [gap:14px] [justify-content:space-between] [&_h2]:[font-size:23px] [&_h2]:[margin:0_0_7px] [&_p]:[color:#bcbccb] [&_p]:[font-size:13px] [&_p]:[line-height:1.4] [&_p]:[margin:0] [&_button]:[height:30px] [&_button]:[background:none] [&_button]:[border:0] [&_button]:[color:#fff] [&_button]:[cursor:pointer]"}><div><h2>Create Voice Widget</h2><p>Connect a saved voice agent to a website.</p></div><button onClick={()=>setOpen(false)} aria-label="Close"><X size={20}/></button></div><div className={"widget-drawer-steps [display:flex] [justify-content:space-between] [gap:5px] [border-bottom:1px_solid_#48434c] [margin:25px_0] [padding-bottom:28px] [&_span]:[display:flex] [&_span]:[flex-direction:column] [&_span]:[align-items:center] [&_span]:[gap:7px] [&_span]:[text-align:center] [&_span]:[min-width:0] [&_span]:[flex:1] [&_span]:[color:#b4b0c4] [&_span]:[font-size:10px] [&_b]:[border:1px_solid_#636272] [&_b]:[width:30px] [&_b]:[height:30px] [&_b]:[display:grid] [&_b]:[place-items:center] [&_b]:[border-radius:50%] [&_b]:[font-size:12px] [&_b.current]:[background:#6740df] [&_b.current]:[border:0] [&_b.current]:[color:#fff]"}>{['Agent','Appearance','Conversation','Website & hours','Test & install'].map((label,i)=><span key={label}><b className={(i===0?'current':'')}>{i+1}</b>{label}</span>)}</div><h3>Select a voice agent</h3><p className={"muted [color:var(--muted)] [margin:0] [line-height:1.5]"}>Choose a ready agent to connect to this widget.</p><label className={"field [display:grid] [gap:8px] [font-size:14px] [&_input]:[width:100%] [&_input]:[border-radius:8px] [&_input]:[border:1px_solid_#454551] [&_input]:[background:#202128] [&_input]:[padding:12px_13px] [&_input]:[color:#f5f5f8] [&_input]:[outline:0] [&_input]:[font-size:14px] [&_textarea]:[width:100%] [&_textarea]:[border-radius:8px] [&_textarea]:[border:1px_solid_#454551] [&_textarea]:[background:#202128] [&_textarea]:[padding:12px_13px] [&_textarea]:[color:#f5f5f8] [&_textarea]:[outline:0] [&_textarea]:[font-size:14px] [&_select]:[width:100%] [&_select]:[border-radius:8px] [&_select]:[border:1px_solid_#454551] [&_select]:[background:#202128] [&_select]:[padding:12px_13px] [&_select]:[color:#f5f5f8] [&_select]:[outline:0] [&_select]:[font-size:14px] [&_textarea]:[resize:vertical] [&_textarea]:[line-height:1.5] [&_input:focus]:[border-color:#a47aff] [&_input:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_textarea:focus]:[border-color:#a47aff] [&_textarea:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_select:focus]:[border-color:#a47aff] [&_select:focus]:[box-shadow:0_0_0_3px_#7646e323] [&_small]:[color:var(--muted)] [&_small]:[font-size:12px]"}><span className={"field-label [color:#f0eff5] [font-weight:540]"}>Widget name</span><input value={name} onChange={e=>setName(e.target.value)} placeholder="Website Voice Support"/></label><p className={"field-label [color:#f0eff5] [font-weight:540]"}>Voice agent</p><div className={"agent-choice-list [display:grid] [gap:8px] [margin:10px_0_18px] [&_button]:[display:flex] [&_button]:[gap:9px] [&_button]:[align-items:center] [&_button]:[width:100%] [&_button]:[text-align:left] [&_button]:[background:#25242c] [&_button]:[border:1px_solid_#454251] [&_button]:[border-radius:8px] [&_button]:[color:#f7f4ff] [&_button]:[padding:10px] [&_button]:[cursor:pointer] [&_button.active]:[border-color:#9766ff] [&_button.active]:[background:#342647] [&_button:disabled]:[opacity:.5] [&_button:disabled]:[cursor:not-allowed] [&_button>span:first-child]:[background:#433064] [&_button>span:first-child]:[color:#c6a5ff] [&_button>span:first-child]:[display:grid] [&_button>span:first-child]:[place-items:center] [&_button>span:first-child]:[width:39px] [&_button>span:first-child]:[height:39px] [&_button>span:first-child]:[border-radius:8px] [&_button>span:nth-child(2)]:[flex:1] [&_button>span:nth-child(2)]:[min-width:0] [&_strong]:[display:block] [&_small]:[display:block] [&_small]:[font-size:10px] [&_small]:[color:#aaaabd] [&_small]:[overflow:hidden] [&_small]:[text-overflow:ellipsis] [&_small]:[white-space:nowrap] [&_em]:[font-size:10px] [&_em]:[color:#4ddba6] [&_em]:[font-style:normal] [&_b]:[border:1px_solid_#8b72c6] [&_b]:[border-radius:50%] [&_b]:[width:20px] [&_b]:[height:20px] [&_b]:[display:grid] [&_b]:[place-items:center]"}>{agents.map(agent=><button key={agent._id} className={(agentId===agent._id?'active':'')} onClick={()=>setAgentId(agent._id)} disabled={agent.status!=='ready'}><span><Headphones size={20}/></span><span><strong>{agent.name}</strong><small>{agent.voice} · {(agent.languages||[]).join(', ')}</small></span><em>{agent.status==='ready'?'● Ready':'Draft'}</em><b>{agentId===agent._id?<Check size={16}/>:''}</b></button>)}</div><p className={"widget-drawer-info [border:1px_solid_#44414d] [background:#302e38] [border-radius:8px] [padding:13px] [color:#c3c4d0] [font-size:12px] [display:flex] [align-items:center] [gap:10px]"}><Info size={17}/> An agent must be saved and ready before it can be connected.</p>{error&&<p className={"flow-alert problem [display:flex] [gap:10px] [align-items:center] [background:#173b34] [border:1px_solid_#296a55] [color:#81e4b8] [padding:13px_16px] [border-radius:9px] [margin:15px_0] [font-size:14px] [&.problem]:[background:#402630] [&.problem]:[border-color:#a44c68] [&.problem]:[color:#ffb5c1]"} role="status">{error}</p>}<div className={"widget-drawer-footer [position:sticky] [bottom:-100px] [background:#211f28] [padding:18px_0] [display:flex] [gap:9px] [justify-content:flex-end] [border-top:1px_solid_#45424a] [margin-top:35px]"}><button className={"button secondary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} onClick={()=>setOpen(false)}>Cancel</button><button className={"button primary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} disabled={busy} onClick={create}>{busy?'Creating…':'Continue to appearance'} <ChevronRight size={16}/></button></div></aside></div>}</div>;
+export default function WidgetList({ records, agents, onUpdate }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [agentId, setAgentId] = useState('');
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('All');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const visible = records.filter(
+    (r) =>
+      (filter === 'All' || r.status === (filter === 'Live' ? 'published' : 'draft')) &&
+      `${r.title} ${r.data?.screen_7?.['Voice agent'] || ''}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
+  );
+  function openNew() {
+    setName('');
+    setAgentId(agents.find((agent) => agent.status === 'ready')?._id || '');
+    setError('');
+    setOpen(true);
+  }
+  async function create() {
+    const agent = agents.find((item) => item._id === agentId);
+    if (!name.trim()) return setError('Enter a widget name.');
+    if (!agent || agent.status !== 'ready') return setError('Select a saved, ready voice agent.');
+    setBusy(true);
+    setError('');
+    try {
+      const response = await apiFetch('/api/records/widget', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: name.trim(),
+          data: { screen_7: { 'Widget name': name.trim(), 'Voice agent': agent.name } },
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || 'Could not create widget.');
+      localStorage.setItem('chatbucket:widget', data._id);
+      await onUpdate();
+      router.push('/flow/8');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className={'widget-list-screen text-[#f8f6ff] max-w-387.5 m-auto'}>
+      <div className="widget-main-list">
+        <div
+          className={
+            'widget-list-title flex justify-between items-center gap-3.75 mb-6.25 [&_h1]:text-3xl [&_h1]:tracking-[-.04em] [&_h1]:m-[0_0_7px] [&_p]:text-[#adb2c4] [&_p]:m-0 max-[900px]:flex-wrap'
+          }
+        >
+          <div>
+            <h1>Voice Widgets</h1>
+            <p>Put voice conversations on your website.</p>
+          </div>
+          <button
+            className={
+              'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+            }
+            onClick={openNew}
+          >
+            <Plus size={18} /> Create widget
+          </button>
+        </div>
+        <div
+          className={
+            'widget-summary-cards grid grid-cols-[repeat(3,_1fr)] gap-3.75 m-[30px_0] max-[900px]:grid-cols-[repeat(2,_1fr)]'
+          }
+        >
+          {[
+            ['Live', records.filter((r) => r.status === 'published').length, AudioLines],
+            ['Draft', records.filter((r) => r.status === 'draft').length, Code2],
+            ['Calls this week', 'Demo', Activity],
+          ].map(([label, value, Icon]) => (
+            <div
+              className={
+                'widget-summary-card border border-[#3d3b49] bg-[#1e1e25] rounded-[11px] p-5 flex gap-5 items-center min-h-25 [&>span]:bg-[#3b2e5b] [&>span]:rounded-[10px] [&>span]:text-[#ad7bff] [&>span]:w-13.5 [&>span]:h-13.5 [&>span]:grid [&>span]:place-items-center [&_div]:text-[#bfc2cf] [&_div]:text-[13px] [&_strong]:block [&_strong]:text-white [&_strong]:text-[25px] [&_strong]:mt-1.25'
+              }
+              key={label}
+            >
+              <span>
+                <Icon size={27} />
+              </span>
+              <div>
+                {label}
+                <strong>{value}</strong>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div
+          className={
+            'widget-list-tools flex justify-between items-center gap-3 m-[30px_0_15px] [&_label]:flex [&_label]:items-center [&_label]:gap-2.5 [&_label]:border [&_label]:border-[#41404b] [&_label]:rounded-[9px] [&_label]:p-[10px_14px] [&_label]:text-[#b9bfce] [&_input]:bg-transparent [&_input]:border-0 [&_input]:text-white [&_input]:outline-0 [&_input]:w-67.5 [&_input]:[font:inherit] [&_input]:text-xs [&_select]:bg-[#23232b] [&_select]:text-white [&_select]:border [&_select]:border-[#44434e] [&_select]:rounded-lg [&_select]:p-2.75 max-[900px]:flex-wrap'
+          }
+        >
+          <label>
+            <Search size={19} />
+            <input
+              placeholder="Search voice widgets…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </label>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            aria-label="Filter widgets by status"
+          >
+            <option>All</option>
+            <option>Live</option>
+            <option>Draft</option>
+          </select>
+        </div>
+        <div
+          className={
+            'widget-table border border-[#393945] rounded-xl bg-[#1d1e25] overflow-hidden max-[1250px]:overflow-x-auto'
+          }
+        >
+          <div
+            className={
+              'widget-table-head grid grid-cols-[2fr_1.25fr_1.55fr_.7fr_1fr_.7fr] items-center gap-2 p-[17px_15px] text-[#bdc0cd] text-xs bg-[#24242d] max-[1250px]:min-w-227.5'
+            }
+          >
+            <span>Widget</span>
+            <span>Website</span>
+            <span>Connected agent</span>
+            <span>Status</span>
+            <span>Last activity</span>
+            <span>Actions</span>
+          </div>
+          {visible.map((item) => (
+            <div
+              className={
+                'widget-table-row grid grid-cols-[2fr_1.25fr_1.55fr_.7fr_1fr_.7fr] items-center gap-2 p-[17px_15px] border-t border-t-[#36363f] text-[#e7e5ed] text-xs [&>span:nth-child(3)]:flex [&>span:nth-child(3)]:items-center [&>span:nth-child(3)]:gap-1.25 [&_em]:not-italic [&_em]:rounded-[20px] [&_em]:p-[6px_10px] [&_em]:text-[11px] [&_em]:whitespace-nowrap [&_em.live]:text-[#48ddae] [&_em.live]:bg-[#193c36] [&_em.draft]:text-[#ffd27d] [&_em.draft]:bg-[#493a24] [&_button]:inline-flex [&_button]:items-center [&_button]:gap-1.25 [&_button]:bg-[#282832] [&_button]:text-white [&_button]:border [&_button]:border-[#454552] [&_button]:rounded-[7px] [&_button]:p-2 [&_button]:cursor-pointer [&_button]:text-[11px] max-[1250px]:min-w-227.5'
+              }
+              key={item._id}
+            >
+              <span
+                className={
+                  'widget-cell-name flex items-center gap-2.5 [&>span:last-child]:min-w-0 [&_strong]:block [&_small]:block [&_small]:text-[#afb0c0] [&_small]:text-[11px] [&_small]:mt-1'
+                }
+              >
+                <span
+                  className={
+                    'widget-cell-icon w-11 h-11 shrink-0 grid place-items-center rounded-[7px] text-[#a773ff] bg-[#34294f]'
+                  }
+                >
+                  <AudioLines size={23} />
+                </span>
+                <span>
+                  <strong>{item.title}</strong>
+                  <small>Voice support on your website</small>
+                </span>
+              </span>
+              <span>{item.data?.screen_11?.['Allowed website URL'] || 'Not set'}</span>
+              <span>
+                <Headphones size={18} />
+                {item.data?.screen_7?.['Voice agent'] || 'Choose agent'}
+              </span>
+              <span>
+                <em className={item.status === 'published' ? 'live' : 'draft'}>
+                  ● {item.status === 'published' ? 'Live' : 'Draft'}
+                </em>
+              </span>
+              <span>
+                {new Date(item.updatedAt).toLocaleDateString('en-IN', {
+                  day: 'numeric',
+                  month: 'short',
+                })}
+              </span>
+              <span>
+                <button
+                  onClick={() => {
+                    localStorage.setItem('chatbucket:widget', item._id);
+                    router.push('/flow/8');
+                  }}
+                >
+                  <Edit3 size={15} /> Edit
+                </button>
+              </span>
+            </div>
+          ))}
+          {visible.length === 0 && (
+            <p className={'widget-empty p-7.5 text-center text-[#b5b5c4]'}>
+              No widgets match this search. Create a voice widget to continue.
+            </p>
+          )}
+        </div>
+      </div>
+      {open && (
+        <div
+          className={
+            'widget-drawer-backdrop fixed inset-0 bg-[rgba(0,_0,_0,_.52)] z-[110] flex justify-end'
+          }
+          onClick={() => setOpen(false)}
+        >
+          <aside
+            className={
+              'widget-create-drawer w-[min(530px,_100vw)] h-screen overflow-auto bg-[#211f28] border-l border-l-[#4b435d] p-[28px_24px_100px] relative shadow-[-20px_0_70px_#0008] [&_h3]:mt-5 [&>.field]:m-[18px_0]'
+            }
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Create Voice Widget"
+          >
+            <div
+              className={
+                'widget-drawer-heading flex gap-3.5 justify-between [&_h2]:text-[23px] [&_h2]:m-[0_0_7px] [&_p]:text-[#bcbccb] [&_p]:text-[13px] [&_p]:leading-[1.4] [&_p]:m-0 [&_button]:h-7.5 [&_button]:bg-none [&_button]:border-0 [&_button]:text-white [&_button]:cursor-pointer'
+              }
+            >
+              <div>
+                <h2>Create Voice Widget</h2>
+                <p>Connect a saved voice agent to a website.</p>
+              </div>
+              <button onClick={() => setOpen(false)} aria-label="Close">
+                <X size={20} />
+              </button>
+            </div>
+            <div
+              className={
+                'widget-drawer-steps flex justify-between gap-1.25 border-b border-b-[#48434c] m-[25px_0] pb-7 [&_span]:flex [&_span]:flex-col [&_span]:items-center [&_span]:gap-1.75 [&_span]:text-center [&_span]:min-w-0 [&_span]:flex-1 [&_span]:text-[#b4b0c4] [&_span]:text-[10px] [&_b]:border [&_b]:border-[#636272] [&_b]:w-7.5 [&_b]:h-7.5 [&_b]:grid [&_b]:place-items-center [&_b]:rounded-full [&_b]:text-xs [&_b.current]:bg-[#6740df] [&_b.current]:border-0 [&_b.current]:text-white'
+              }
+            >
+              {['Agent', 'Appearance', 'Conversation', 'Website & hours', 'Test & install'].map(
+                (label, i) => (
+                  <span key={label}>
+                    <b className={i === 0 ? 'current' : ''}>{i + 1}</b>
+                    {label}
+                  </span>
+                ),
+              )}
+            </div>
+            <h3>Select a voice agent</h3>
+            <p className={'muted text-(--muted) m-0 leading-normal'}>
+              Choose a ready agent to connect to this widget.
+            </p>
+            <label
+              className={
+                'field grid gap-2 text-sm [&_input]:w-full [&_input]:rounded-lg [&_input]:border [&_input]:border-[#454551] [&_input]:bg-[#202128] [&_input]:p-[12px_13px] [&_input]:text-[#f5f5f8] [&_input]:outline-0 [&_input]:text-sm [&_textarea]:w-full [&_textarea]:rounded-lg [&_textarea]:border [&_textarea]:border-[#454551] [&_textarea]:bg-[#202128] [&_textarea]:p-[12px_13px] [&_textarea]:text-[#f5f5f8] [&_textarea]:outline-0 [&_textarea]:text-sm [&_select]:w-full [&_select]:rounded-lg [&_select]:border [&_select]:border-[#454551] [&_select]:bg-[#202128] [&_select]:p-[12px_13px] [&_select]:text-[#f5f5f8] [&_select]:outline-0 [&_select]:text-sm [&_textarea]:resize-y [&_textarea]:leading-normal [&_input:focus]:border-[#a47aff] [&_input:focus]:shadow-[0_0_0_3px_#7646e323] [&_textarea:focus]:border-[#a47aff] [&_textarea:focus]:shadow-[0_0_0_3px_#7646e323] [&_select:focus]:border-[#a47aff] [&_select:focus]:shadow-[0_0_0_3px_#7646e323] [&_small]:text-(--muted) [&_small]:text-xs'
+              }
+            >
+              <span className={'field-label text-[#f0eff5] font-[540]'}>Widget name</span>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Website Voice Support"
+              />
+            </label>
+            <p className={'field-label text-[#f0eff5] font-[540]'}>Voice agent</p>
+            <div
+              className={
+                'agent-choice-list grid gap-2 m-[10px_0_18px] [&_button]:flex [&_button]:gap-2.25 [&_button]:items-center [&_button]:w-full [&_button]:text-left [&_button]:bg-[#25242c] [&_button]:border [&_button]:border-[#454251] [&_button]:rounded-lg [&_button]:text-[#f7f4ff] [&_button]:p-2.5 [&_button]:cursor-pointer [&_button.active]:border-[#9766ff] [&_button.active]:bg-[#342647] [&_button:disabled]:opacity-50 [&_button:disabled]:cursor-not-allowed [&_button>span:first-child]:bg-[#433064] [&_button>span:first-child]:text-[#c6a5ff] [&_button>span:first-child]:grid [&_button>span:first-child]:place-items-center [&_button>span:first-child]:w-9.75 [&_button>span:first-child]:h-9.75 [&_button>span:first-child]:rounded-lg [&_button>span:nth-child(2)]:flex-1 [&_button>span:nth-child(2)]:min-w-0 [&_strong]:block [&_small]:block [&_small]:text-[10px] [&_small]:text-[#aaaabd] [&_small]:overflow-hidden [&_small]:text-ellipsis [&_small]:whitespace-nowrap [&_em]:text-[10px] [&_em]:text-[#4ddba6] [&_em]:not-italic [&_b]:border [&_b]:border-[#8b72c6] [&_b]:rounded-full [&_b]:w-5 [&_b]:h-5 [&_b]:grid [&_b]:place-items-center'
+              }
+            >
+              {agents.map((agent) => (
+                <button
+                  key={agent._id}
+                  className={agentId === agent._id ? 'active' : ''}
+                  onClick={() => setAgentId(agent._id)}
+                  disabled={agent.status !== 'ready'}
+                >
+                  <span>
+                    <Headphones size={20} />
+                  </span>
+                  <span>
+                    <strong>{agent.name}</strong>
+                    <small>
+                      {agent.voice} · {(agent.languages || []).join(', ')}
+                    </small>
+                  </span>
+                  <em>{agent.status === 'ready' ? '● Ready' : 'Draft'}</em>
+                  <b>{agentId === agent._id ? <Check size={16} /> : ''}</b>
+                </button>
+              ))}
+            </div>
+            <p
+              className={
+                'widget-drawer-info border border-[#44414d] bg-[#302e38] rounded-lg p-3.25 text-[#c3c4d0] text-xs flex items-center gap-2.5'
+              }
+            >
+              <Info size={17} /> An agent must be saved and ready before it can be connected.
+            </p>
+            {error && (
+              <p
+                className={
+                  'flow-alert problem flex gap-2.5 items-center bg-[#173b34] border border-[#296a55] text-[#81e4b8] p-[13px_16px] rounded-[9px] m-[15px_0] text-sm [&.problem]:bg-[#402630] [&.problem]:border-[#a44c68] [&.problem]:text-[#ffb5c1]'
+                }
+                role="status"
+              >
+                {error}
+              </p>
+            )}
+            <div
+              className={
+                'widget-drawer-footer sticky bottom--25 bg-[#211f28] p-[18px_0] flex gap-2.25 justify-end border-t border-t-[#45424a] mt-8.75'
+              }
+            >
+              <button
+                className={
+                  'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+                }
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={
+                  'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+                }
+                disabled={busy}
+                onClick={create}
+              >
+                {busy ? 'Creating…' : 'Continue to appearance'} <ChevronRight size={16} />
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+    </div>
+  );
 }

@@ -1,2 +1,4 @@
-import {RoutingCreate} from '../../../components/RoutingPages';
-export default function Page(){return <RoutingCreate/>}
+import { RoutingCreate } from '../../../components/RoutingPages';
+export default function Page() {
+  return <RoutingCreate />;
+}

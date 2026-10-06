@@ -1,2 +1,4 @@
-import {TeamPermissions} from '../../../components/TeamPages';
-export default function Page(){return <TeamPermissions/>}
+import { TeamPermissions } from '../../../components/TeamPages';
+export default function Page() {
+  return <TeamPermissions />;
+}

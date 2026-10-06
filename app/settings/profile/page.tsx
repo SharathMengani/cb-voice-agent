@@ -1,2 +1,4 @@
-import {MerchantProfile} from '../../../components/WidgetPages';
-export default function Page(){return <MerchantProfile/>}
+import { MerchantProfile } from '../../../components/WidgetPages';
+export default function Page() {
+  return <MerchantProfile />;
+}

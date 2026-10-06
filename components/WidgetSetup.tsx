@@ -1,22 +1,448 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, AudioLines, Check, CheckCircle2, Clipboard, Globe2, Headphones, Info, Mic, Phone, ShieldCheck, Smartphone, Volume2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  AudioLines,
+  Check,
+  CheckCircle2,
+  Clipboard,
+  Globe2,
+  Headphones,
+  Info,
+  Mic,
+  Phone,
+  ShieldCheck,
+  Smartphone,
+  Volume2,
+} from 'lucide-react';
 
-const steps=['Agent','Appearance','Conversation','Website & hours','Test & install'];
-const headings={8:'Design your voice widget',9:'Set your greeting & caller details',10:'Route calls to your team',11:'Set website & availability',12:'Review, test & publish'};
-const descriptions={8:'Customize the look and behavior of your voice widget to match your brand.',9:'Welcome callers and collect the details your team needs.',10:'Set the conditions for a smooth AI-to-human handoff.',11:'Choose where and when the voice widget appears.',12:'Preview the widget, check its setup and publish your demo.'};
-function Field({field,form,setForm}){
-  const value=form[field.label]??(field.type==='color'?'#7c3aed':'');const update=event=>setForm(current=>({...current,[field.label]:field.type==='switch'?event.target.checked:event.target.value}));
-  if(field.type==='switch')return <label className={"widget-setup-switch [grid-column:1/-1] [display:flex] [align-items:center] [justify-content:space-between] [gap:10px] [padding:12px] [border:1px_solid_#44434e] [border-radius:8px] [color:#e6e4ef] [font-size:12px] [&_input]:[accent-color:#7c52f5] [&_input]:[width:18px] [&_input]:[height:18px]"}><span>{field.label}</span><input type="checkbox" checked={Boolean(value)} onChange={update}/></label>;
-  return <label className={"widget-setup-field [display:flex] [flex-direction:column] [gap:8px] [color:#d9d9e3] [font-size:12px] [&:has(textarea)]:[grid-column:1/-1] [&_input]:[background:#23232b] [&_input]:[border:1px_solid_#46444e] [&_input]:[color:#fff] [&_input]:[border-radius:7px] [&_input]:[padding:11px_12px] [&_input]:[min-width:0] [&_input]:[font:inherit] [&_input]:[font-size:12px] [&_textarea]:[background:#23232b] [&_textarea]:[border:1px_solid_#46444e] [&_textarea]:[color:#fff] [&_textarea]:[border-radius:7px] [&_textarea]:[padding:11px_12px] [&_textarea]:[min-width:0] [&_textarea]:[font:inherit] [&_textarea]:[font-size:12px] [&_select]:[background:#23232b] [&_select]:[border:1px_solid_#46444e] [&_select]:[color:#fff] [&_select]:[border-radius:7px] [&_select]:[padding:11px_12px] [&_select]:[min-width:0] [&_select]:[font:inherit] [&_select]:[font-size:12px] [&_input[type=color]]:[width:100%] [&_input[type=color]]:[height:42px] [&_input[type=color]]:[padding:4px]"}><span>{field.label}</span>{field.type==='textarea'?<textarea value={value} rows={3} onChange={update} placeholder={field.label}/>:field.type==='select'?<select value={value} onChange={update}><option value="">Choose an option</option>{field.options.map(option=><option key={option}>{option}</option>)}</select>:<input type={field.type||'text'} value={value} onChange={update} placeholder={field.label}/>}</label>;
+const steps = ['Agent', 'Appearance', 'Conversation', 'Website & hours', 'Test & install'];
+const headings = {
+  8: 'Design your voice widget',
+  9: 'Set your greeting & caller details',
+  10: 'Route calls to your team',
+  11: 'Set website & availability',
+  12: 'Review, test & publish',
+};
+const descriptions = {
+  8: 'Customize the look and behavior of your voice widget to match your brand.',
+  9: 'Welcome callers and collect the details your team needs.',
+  10: 'Set the conditions for a smooth AI-to-human handoff.',
+  11: 'Choose where and when the voice widget appears.',
+  12: 'Preview the widget, check its setup and publish your demo.',
+};
+function Field({ field, form, setForm }) {
+  const value = form[field.label] ?? (field.type === 'color' ? '#7c3aed' : '');
+  const update = (event) =>
+    setForm((current) => ({
+      ...current,
+      [field.label]: field.type === 'switch' ? event.target.checked : event.target.value,
+    }));
+  if (field.type === 'switch')
+    return (
+      <label
+        className={
+          'widget-setup-switch col-[1/-1] flex items-center justify-between gap-2.5 p-3 border border-[#44434e] rounded-lg text-[#e6e4ef] text-xs [&_input]:accent-[#7c52f5] [&_input]:w-4.5 [&_input]:h-4.5'
+        }
+      >
+        <span>{field.label}</span>
+        <input type="checkbox" checked={Boolean(value)} onChange={update} />
+      </label>
+    );
+  return (
+    <label
+      className={
+        'widget-setup-field flex flex-col gap-2 text-[#d9d9e3] text-xs [&:has(textarea)]:col-[1/-1] [&_input]:bg-[#23232b] [&_input]:border [&_input]:border-[#46444e] [&_input]:text-white [&_input]:rounded-[7px] [&_input]:p-[11px_12px] [&_input]:min-w-0 [&_input]:[font:inherit] [&_input]:text-xs [&_textarea]:bg-[#23232b] [&_textarea]:border [&_textarea]:border-[#46444e] [&_textarea]:text-white [&_textarea]:rounded-[7px] [&_textarea]:p-[11px_12px] [&_textarea]:min-w-0 [&_textarea]:[font:inherit] [&_textarea]:text-xs [&_select]:bg-[#23232b] [&_select]:border [&_select]:border-[#46444e] [&_select]:text-white [&_select]:rounded-[7px] [&_select]:p-[11px_12px] [&_select]:min-w-0 [&_select]:[font:inherit] [&_select]:text-xs [&_input[type=color]]:w-full [&_input[type=color]]:h-10.5 [&_input[type=color]]:p-1'
+      }
+    >
+      <span>{field.label}</span>
+      {field.type === 'textarea' ? (
+        <textarea value={value} rows={3} onChange={update} placeholder={field.label} />
+      ) : field.type === 'select' ? (
+        <select value={value} onChange={update}>
+          <option value="">Choose an option</option>
+          {field.options.map((option) => (
+            <option key={option}>{option}</option>
+          ))}
+        </select>
+      ) : (
+        <input
+          type={field.type || 'text'}
+          value={value}
+          onChange={update}
+          placeholder={field.label}
+        />
+      )}
+    </label>
+  );
 }
-export default function WidgetSetup({number,config,form,setForm,record,agents,feedback,working,onSave,embedOrigin}){
-  const [device,setDevice]=useState('Desktop');const [copied,setCopied]=useState(false);const [mic,setMic]=useState(false);
-  const step=number===8?2:number===11?4:number===12?5:3;
-  const code=`<script src="${embedOrigin}/chatbucket-voice.js" data-widget-id="${record?._id||'WIDGET_ID'}"></script>`;
-  const selectedAgent=record?.data?.screen_7?.['Voice agent']||'Website Support';
-  const ready=Boolean(selectedAgent&&record?.data?.screen_11?.['Allowed website URL']);
-  async function test(){try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});stream.getTracks().forEach(t=>t.stop());setMic(true)}catch{setMic(false)}}
-  return <div className={"widget-setup-page [max-width:1500px] [margin:auto] [color:#faf9ff] [&>h1]:[font-size:27px] [&>h1]:[letter-spacing:-.03em] [&>h1]:[margin:8px_0_5px]"}><Link href="/flow/7" className={"back-campaign [display:inline-flex] [align-items:center] [gap:7px] [color:#bfbcd1] [text-decoration:none] [font-size:12px] [margin-bottom:12px]"}><ArrowLeft size={16}/> Back to voice widgets</Link><h1>{headings[number]}</h1><p className={"widget-setup-caption [color:#b3b9c9] [margin:0_0_22px]"}>{descriptions[number]}</p><div className={"widget-stepper [display:grid] [grid-template-columns:repeat(5,_1fr)] [gap:10px] [margin-bottom:22px] [&_a]:[text-decoration:none] [&_a]:[color:#bfc0d0] [&_a]:[position:relative] [&_a]:[display:flex] [&_a]:[flex-direction:column] [&_a]:[gap:5px] [&_a]:[font-size:12px] [&_a]:[min-width:0] [&_a:not(:last-child):after]:[content:''] [&_a:not(:last-child):after]:[position:absolute] [&_a:not(:last-child):after]:[top:16px] [&_a:not(:last-child):after]:[left:40px] [&_a:not(:last-child):after]:[right:-4px] [&_a:not(:last-child):after]:[height:2px] [&_a:not(:last-child):after]:[background:#55515f] [&_.done:after]:[background:#9364fd]! [&_a>span]:[background:#37363f] [&_a>span]:[width:32px] [&_a>span]:[height:32px] [&_a>span]:[border-radius:50%] [&_a>span]:[display:grid] [&_a>span]:[place-items:center] [&_a>span]:[margin-bottom:5px] [&_a>span]:[z-index:1] [&_a.current>span]:[background:#7046eb] [&_a.current>span]:[color:white] [&_a.done>span]:[background:#7046eb] [&_a.done>span]:[color:white] [&_small]:[font-size:11px] [&_small]:[color:#aeb0c3] [&_small]:[overflow:hidden] [&_small]:[text-overflow:ellipsis] max-[1000px]:[&_small]:[display:none] max-[600px]:[&_a_strong]:[font-size:10px]"}>{steps.map((label,i)=><Link key={label} href={i===0?'/flow/7':`/flow/${[8,8,9,11,12][i]}`} className={(i+1===step?'current':i+1<step?'done':'')}><span>{i+1<step?<Check size={17}/>:i+1}</span><strong>{label}</strong><small>{['Voice agent selected','Design and customize','Greeting and behavior','Where and when to show','Preview and deploy'][i]}</small></Link>)}</div>{feedback&&<p className={"flow-alert [display:flex] [gap:10px] [align-items:center] [background:#173b34] [border:1px_solid_#296a55] [color:#81e4b8] [padding:13px_16px] [border-radius:9px] [margin:15px_0] [font-size:14px] [&.problem]:[background:#402630] [&.problem]:[border-color:#a44c68] [&.problem]:[color:#ffb5c1]"} role="status">{feedback}</p>}<div className={"widget-setup-layout [display:grid] [grid-template-columns:1fr_1.17fr] [gap:12px] max-[1000px]:[grid-template-columns:1fr]"}><section className={"widget-setup-card [border:1px_solid_#3b3944] [border-radius:11px] [background:#1d1d24] [padding:20px] [min-width:0] [&_h2]:[font-size:19px] [&_h2]:[margin:0_0_6px] [&>p]:[color:#b0b3c2] [&>p]:[font-size:12px] [&>p]:[margin:0_0_20px]"}><h2>{number===8?'Brand identity':number===9?'Conversation setup':number===10?'Human handoff':number===11?'Website & hours':'Test your voice widget'}</h2><p>{number===8?'Customize how your voice widget looks on your website.':number===12?'Try the voice preview and review your publish settings.':config.caption}</p>{number!==12?<div className={"widget-setup-fields [display:grid] [grid-template-columns:1fr_1fr] [gap:14px] max-[600px]:[grid-template-columns:1fr]"}>{config.fields.map(field=><Field key={field.label} field={field} form={form} setForm={setForm}/>)}</div>:<div className={"widget-test-card [display:grid] [justify-items:center] [border:1px_solid_#44434c] [padding:35px_15px] [border-radius:9px] [text-align:center] [&_h3]:[margin:28px_0_3px] [&_p]:[color:#c4bdd1] [&_p]:[font-size:12px] [&_.button]:[margin:18px_0]"}><span className={"widget-test-orb [width:110px] [height:110px] [border-radius:50%] [background:#673ce4] [display:grid] [place-items:center] [box-shadow:0_0_0_13px_#312647] [color:white]"}><Mic size={47}/></span><h3>AI voice assistant</h3><p>Acme Support · {selectedAgent}</p><button onClick={test} className={"button primary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"}><Mic size={18}/> {mic?'Microphone ready':'Test microphone'}</button><p className={"widget-test-note [border:1px_solid_#494550] [padding:10px] [border-radius:7px]"}><Volume2 size={17}/> Demo permission test. Open the customer widget to try FAQ voice playback.</p><Link className={"widget-test-link [color:#ac83ff] [text-decoration:none] [font-size:12px]"} href="/flow/28">Open customer preview <ArrowRight size={15}/></Link></div>}{number===8&&<p className={"widget-setup-tip [display:flex] [gap:8px] [align-items:center] [border:1px_solid_#484253] [border-radius:8px] [padding:12px] [color:#c0b1db] [margin:20px_0_0]!"}><Info size={17}/> The preview updates as you enter the brand settings.</p>}</section><section className={"widget-setup-card [border:1px_solid_#3b3944] [border-radius:11px] [background:#1d1d24] [padding:20px] [min-width:0] [&_h2]:[font-size:19px] [&_h2]:[margin:0_0_6px] [&>p]:[color:#b0b3c2] [&>p]:[font-size:12px] [&>p]:[margin:0_0_20px]"}><div className={"widget-preview-heading [&_p]:[color:#b0b3c2] [&_p]:[font-size:12px] [&_p]:[margin:0_0_20px] [display:flex] [justify-content:space-between] [gap:10px] [align-items:flex-start]"}><div><h2>{number===12?'Deployment readiness':'Live preview'}</h2><p>{number===12?'Check the configuration and copy the demo script.':'See how your website voice assistant looks.'}</p></div>{number===8&&<div className={"device-switch [display:flex] [border:1px_solid_#46404f] [border-radius:7px] [overflow:hidden] [&_button]:[padding:9px_13px] [&_button]:[border:0] [&_button]:[background:none] [&_button]:[color:#cec4da] [&_button]:[cursor:pointer] [&_button]:[font-size:11px] [&_button.active]:[background:#6641e9] [&_button.active]:[color:white]"}><button className={(device==='Desktop'?'active':'')} onClick={()=>setDevice('Desktop')}>Desktop</button><button className={(device==='Mobile'?'active':'')} onClick={()=>setDevice('Mobile')}>Mobile</button></div>}</div>{number===12?<><div className={"readiness-list [border:1px_solid_#43424e] [border-radius:8px] [overflow:hidden] [&>div]:[display:flex] [&>div]:[gap:10px] [&>div]:[align-items:center] [&>div]:[padding:10px] [&>div]:[border-top:1px_solid_#3e3d49] [&>div:first-child]:[border:0] [&_svg]:[color:#a481fa] [&>div>span]:[flex:1] [&_strong]:[display:block] [&_small]:[display:block] [&_strong]:[font-size:12px] [&_small]:[color:#adb0bd] [&_small]:[font-size:10px] [&_em]:[font-size:10px] [&_em]:[color:#ffbd70] [&_em]:[font-style:normal] [&_em.yes]:[color:#4cdda4]"}>{[['Voice agent connected',Boolean(selectedAgent),selectedAgent],['Greeting ready',Boolean(record?.data?.screen_9||record?.data?.screen_8),'Welcome configured'],['Human handoff',Boolean(record?.data?.screen_10),'Routes to the selected team'],['Website added',Boolean(record?.data?.screen_11?.['Allowed website URL']),record?.data?.screen_11?.['Allowed website URL']||'Enter the website on screen 11'],['Offline fallback',Boolean(record?.data?.screen_11),'After-hours settings']].map(([label,isReady,description])=><div key={label}><Headphones size={18}/><span><strong>{label}</strong><small>{description}</small></span><em className={(isReady?'yes':'')}>{isReady?'● Ready':'Setup needed'}</em></div>)}</div><div className={"widget-install [border:1px_solid_#454250] [border-radius:8px] [padding:13px] [margin-top:15px] [&_h3]:[margin:0] [&_h3]:[font-size:14px] [&_p]:[font-size:11px] [&_p]:[color:#bfc0cb] [&_code]:[display:block] [&_code]:[white-space:pre-wrap] [&_code]:[overflow-wrap:anywhere] [&_code]:[background:#181920] [&_code]:[border:1px_solid_#46424f] [&_code]:[color:#cbb8ff] [&_code]:[padding:10px] [&_code]:[font-size:10px] [&_button]:[color:white] [&_button]:[background:#4f3a8c] [&_button]:[border:1px_solid_#8a64ee] [&_button]:[border-radius:6px] [&_button]:[padding:8px_10px] [&_button]:[margin-top:9px] [&_button]:[cursor:pointer] [&_button]:[font-size:11px]"}><h3>Install on your website</h3><p>Use this script after publishing the demo widget.</p><code>{code}</code><button onClick={()=>navigator.clipboard.writeText(code).then(()=>setCopied(true))}><Clipboard size={15}/> {copied?'Copied':'Copy code'}</button></div></>:<div className={(`preview-browser [max-width:100%] [background:#fff] [border-radius:8px] [overflow:hidden] [min-height:400px] [color:#1f2332] [&.mobile]:[max-width:340px] [&.mobile]:[margin:auto]${device==='Mobile'?'mobile':''}`)}><div className={"browser-bar [display:flex] [align-items:center] [gap:6px] [background:#33343a] [padding:10px] [&_i]:[width:9px] [&_i]:[height:9px] [&_i]:[border-radius:50%] [&_i]:[background:#ff6b66] [&_i:nth-child(2)]:[background:#ffce57] [&_i:nth-child(3)]:[background:#44db8b] [&_span]:[flex:1] [&_span]:[background:#27282d] [&_span]:[border-radius:20px] [&_span]:[color:#d8dbe1] [&_span]:[padding:4px_12px] [&_span]:[font-size:10px] [&_span]:[margin-left:9px]"}><i/> <i/> <i/><span>⌕ &nbsp; www.acme.com</span></div><div className={"preview-site [min-height:390px] [background:linear-gradient(150deg,_#fff_45%,_#dce0ff)] [padding:13px] [position:relative]"}><div className={"preview-site-nav [display:flex] [align-items:center] [justify-content:space-between] [font-size:10px] [&_b]:[font-size:15px] [&_strong]:[background:#673be9] [&_strong]:[border-radius:6px] [&_strong]:[color:white] [&_strong]:[padding:9px] [&_strong]:[font-size:10px]"}><b>◆ Acme</b><span>Products &nbsp;&nbsp; Solutions &nbsp;&nbsp; Pricing</span><strong>Get started</strong></div><div className={"preview-site-hero [&_span]:[background:#673be9] [&_span]:[border-radius:6px] [&_span]:[color:white] [&_span]:[padding:9px] [&_span]:[font-size:10px] [margin:75px_0_0_15px] [max-width:48%] [&_small]:[color:#7546f2] [&_small]:[font-weight:700] [&_small]:[font-size:9px] [&_h3]:[font-size:25px] [&_h3]:[letter-spacing:-.04em] [&_h3]:[line-height:1.04] [&_h3]:[margin:8px_0] [&_p]:[font-size:10px] [&_p]:[line-height:1.5]"}><small>AI POWERED SUPPORT</small><h3>Build something<br/>extraordinary</h3><p>Powerful AI solutions for modern businesses.</p><span>Get started</span></div><div className={"preview-widget-card [position:absolute] [right:12px] [bottom:17px] [width:220px] [background:white] [border:1px_solid_#ddd9ef] [border-radius:10px] [padding:12px] [box-shadow:0_8px_30px_#918cb94a] [text-align:center] [&_header]:[display:flex] [&_header]:[align-items:center] [&_header]:[gap:6px] [&_header]:[font-size:11px] [&_header]:[text-align:left] [&_header_span]:[color:var(--preview-accent)] [&_p]:[font-size:10px] [&_p]:[color:#535166] [&_button]:[background:var(--preview-accent)] [&_button]:[border:0] [&_button]:[border-radius:6px] [&_button]:[color:white] [&_button]:[width:100%] [&_button]:[padding:9px] [&_button]:[font-size:10px]"} style={{'--preview-accent':form['Accent color']||'#7c3aed'}}><header><span>◆</span><strong>{form['Widget name']||record?.title||'Acme Voice Support'}</strong></header><div className={"preview-voice-orb [margin:18px_auto] [width:77px] [height:77px] [border-radius:50%] [display:grid] [place-items:center] [color:white] [background:var(--preview-accent)] [box-shadow:0_0_0_7px_#e7ddff]"}><AudioLines size={28}/></div><p>{number===9?form['Welcome message']||'How can we help today?':number===10?'Ask the AI, or request a human specialist.':'Talk with our AI assistant'}</p><button><Phone size={15}/> Start voice conversation</button></div></div></div>}</section></div><div className={"widget-setup-footer [border:1px_solid_#3f3a46] [background:#24232b] [border-radius:9px] [padding:12px] [display:flex] [align-items:center] [justify-content:space-between] [gap:12px] [margin-top:12px] [&>span]:[font-size:11px] [&>span]:[color:#aeb0bf] max-[600px]:[flex-wrap:wrap]"}><Link className={"button secondary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} href={`/flow/${number===8?7:number===12?11:number-1}`}><ArrowLeft size={16}/> Back</Link><span>{number===12?(ready?'Ready for demo publishing':'Complete the website and agent setup to publish'):'Settings are saved as you continue.'}</span><button disabled={working} className={"button primary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} onClick={()=>onSave({advance:number!==12,status:number===12?'published':undefined})}>{working?'Saving…':number===12?'Publish voice widget':number===11?'Continue to test & install':'Save & continue'} <ArrowRight size={16}/></button></div></div>;
+export default function WidgetSetup({
+  number,
+  config,
+  form,
+  setForm,
+  record,
+  agents,
+  feedback,
+  working,
+  onSave,
+  embedOrigin,
+}) {
+  const [device, setDevice] = useState('Desktop');
+  const [copied, setCopied] = useState(false);
+  const [mic, setMic] = useState(false);
+  const step = number === 8 ? 2 : number === 11 ? 4 : number === 12 ? 5 : 3;
+  const code = `<script src="${embedOrigin}/chatbucket-voice.js" data-widget-id="${record?._id || 'WIDGET_ID'}"></script>`;
+  const selectedAgent = record?.data?.screen_7?.['Voice agent'] || 'Website Support';
+  const ready = Boolean(selectedAgent && record?.data?.screen_11?.['Allowed website URL']);
+  async function test() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop());
+      setMic(true);
+    } catch {
+      setMic(false);
+    }
+  }
+  return (
+    <div
+      className={
+        'widget-setup-page max-w-375 m-auto text-[#faf9ff] [&>h1]:text-[27px] [&>h1]:tracking-[-.03em] [&>h1]:m-[8px_0_5px]'
+      }
+    >
+      <Link
+        href="/flow/7"
+        className={
+          'back-campaign inline-flex items-center gap-1.75 text-[#bfbcd1] no-underline text-xs mb-3'
+        }
+      >
+        <ArrowLeft size={16} /> Back to voice widgets
+      </Link>
+      <h1>{headings[number]}</h1>
+      <p className={'widget-setup-caption text-[#b3b9c9] m-[0_0_22px]'}>{descriptions[number]}</p>
+      <div
+        className={
+          "widget-stepper grid grid-cols-[repeat(5,_1fr)] gap-2.5 mb-5.5 [&_a]:no-underline [&_a]:text-[#bfc0d0] [&_a]:relative [&_a]:flex [&_a]:flex-col [&_a]:gap-1.25 [&_a]:text-xs [&_a]:min-w-0 [&_a:not(:last-child):after]:content-[''] [&_a:not(:last-child):after]:absolute [&_a:not(:last-child):after]:top-4 [&_a:not(:last-child):after]:left-10 [&_a:not(:last-child):after]:right--1 [&_a:not(:last-child):after]:h-0.5 [&_a:not(:last-child):after]:bg-[#55515f] [&_.done:after]:bg-[#9364fd]! [&_a>span]:bg-[#37363f] [&_a>span]:w-8 [&_a>span]:h-8 [&_a>span]:rounded-full [&_a>span]:grid [&_a>span]:place-items-center [&_a>span]:mb-1.25 [&_a>span]:z-[1] [&_a.current>span]:bg-[#7046eb] [&_a.current>span]:text-white [&_a.done>span]:bg-[#7046eb] [&_a.done>span]:text-white [&_small]:text-[11px] [&_small]:text-[#aeb0c3] [&_small]:overflow-hidden [&_small]:text-ellipsis max-[1000px]:[&_small]:hidden max-[600px]:[&_a_strong]:text-[10px]"
+        }
+      >
+        {steps.map((label, i) => (
+          <Link
+            key={label}
+            href={i === 0 ? '/flow/7' : `/flow/${[8, 8, 9, 11, 12][i]}`}
+            className={i + 1 === step ? 'current' : i + 1 < step ? 'done' : ''}
+          >
+            <span>{i + 1 < step ? <Check size={17} /> : i + 1}</span>
+            <strong>{label}</strong>
+            <small>
+              {
+                [
+                  'Voice agent selected',
+                  'Design and customize',
+                  'Greeting and behavior',
+                  'Where and when to show',
+                  'Preview and deploy',
+                ][i]
+              }
+            </small>
+          </Link>
+        ))}
+      </div>
+      {feedback && (
+        <p
+          className={
+            'flow-alert flex gap-2.5 items-center bg-[#173b34] border border-[#296a55] text-[#81e4b8] p-[13px_16px] rounded-[9px] m-[15px_0] text-sm [&.problem]:bg-[#402630] [&.problem]:border-[#a44c68] [&.problem]:text-[#ffb5c1]'
+          }
+          role="status"
+        >
+          {feedback}
+        </p>
+      )}
+      <div
+        className={'widget-setup-layout grid grid-cols-[1fr_1.17fr] gap-3 max-[1000px]:grid-cols-1'}
+      >
+        <section
+          className={
+            'widget-setup-card border border-[#3b3944] rounded-[11px] bg-[#1d1d24] p-5 min-w-0 [&_h2]:text-[19px] [&_h2]:m-[0_0_6px] [&>p]:text-[#b0b3c2] [&>p]:text-xs [&>p]:m-[0_0_20px]'
+          }
+        >
+          <h2>
+            {number === 8
+              ? 'Brand identity'
+              : number === 9
+                ? 'Conversation setup'
+                : number === 10
+                  ? 'Human handoff'
+                  : number === 11
+                    ? 'Website & hours'
+                    : 'Test your voice widget'}
+          </h2>
+          <p>
+            {number === 8
+              ? 'Customize how your voice widget looks on your website.'
+              : number === 12
+                ? 'Try the voice preview and review your publish settings.'
+                : config.caption}
+          </p>
+          {number !== 12 ? (
+            <div
+              className={
+                'widget-setup-fields grid grid-cols-[1fr_1fr] gap-3.5 max-[600px]:grid-cols-1'
+              }
+            >
+              {config.fields.map((field) => (
+                <Field key={field.label} field={field} form={form} setForm={setForm} />
+              ))}
+            </div>
+          ) : (
+            <div
+              className={
+                'widget-test-card grid justify-items-center border border-[#44434c] p-[35px_15px] rounded-[9px] text-center [&_h3]:m-[28px_0_3px] [&_p]:text-[#c4bdd1] [&_p]:text-xs [&_.button]:m-[18px_0]'
+              }
+            >
+              <span
+                className={
+                  'widget-test-orb w-27.5 h-27.5 rounded-full bg-[#673ce4] grid place-items-center shadow-[0_0_0_13px_#312647] text-white'
+                }
+              >
+                <Mic size={47} />
+              </span>
+              <h3>AI voice assistant</h3>
+              <p>Acme Support · {selectedAgent}</p>
+              <button
+                onClick={test}
+                className={
+                  'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+                }
+              >
+                <Mic size={18} /> {mic ? 'Microphone ready' : 'Test microphone'}
+              </button>
+              <p className={'widget-test-note border border-[#494550] p-2.5 rounded-[7px]'}>
+                <Volume2 size={17} /> Demo permission test. Open the customer widget to try FAQ
+                voice playback.
+              </p>
+              <Link
+                className={'widget-test-link text-[#ac83ff] no-underline text-xs'}
+                href="/flow/28"
+              >
+                Open customer preview <ArrowRight size={15} />
+              </Link>
+            </div>
+          )}
+          {number === 8 && (
+            <p
+              className={
+                'widget-setup-tip flex gap-2 items-center border border-[#484253] rounded-lg p-3 text-[#c0b1db] m-[20px_0_0]!'
+              }
+            >
+              <Info size={17} /> The preview updates as you enter the brand settings.
+            </p>
+          )}
+        </section>
+        <section
+          className={
+            'widget-setup-card border border-[#3b3944] rounded-[11px] bg-[#1d1d24] p-5 min-w-0 [&_h2]:text-[19px] [&_h2]:m-[0_0_6px] [&>p]:text-[#b0b3c2] [&>p]:text-xs [&>p]:m-[0_0_20px]'
+          }
+        >
+          <div
+            className={
+              'widget-preview-heading [&_p]:text-[#b0b3c2] [&_p]:text-xs [&_p]:m-[0_0_20px] flex justify-between gap-2.5 items-start'
+            }
+          >
+            <div>
+              <h2>{number === 12 ? 'Deployment readiness' : 'Live preview'}</h2>
+              <p>
+                {number === 12
+                  ? 'Check the configuration and copy the demo script.'
+                  : 'See how your website voice assistant looks.'}
+              </p>
+            </div>
+            {number === 8 && (
+              <div
+                className={
+                  'device-switch flex border border-[#46404f] rounded-[7px] overflow-hidden [&_button]:p-[9px_13px] [&_button]:border-0 [&_button]:bg-none [&_button]:text-[#cec4da] [&_button]:cursor-pointer [&_button]:text-[11px] [&_button.active]:bg-[#6641e9] [&_button.active]:text-white'
+                }
+              >
+                <button
+                  className={device === 'Desktop' ? 'active' : ''}
+                  onClick={() => setDevice('Desktop')}
+                >
+                  Desktop
+                </button>
+                <button
+                  className={device === 'Mobile' ? 'active' : ''}
+                  onClick={() => setDevice('Mobile')}
+                >
+                  Mobile
+                </button>
+              </div>
+            )}
+          </div>
+          {number === 12 ? (
+            <>
+              <div
+                className={
+                  'readiness-list border border-[#43424e] rounded-lg overflow-hidden [&>div]:flex [&>div]:gap-2.5 [&>div]:items-center [&>div]:p-2.5 [&>div]:border-t [&>div]:border-t-[#3e3d49] [&>div:first-child]:border-0 [&_svg]:text-[#a481fa] [&>div>span]:flex-1 [&_strong]:block [&_small]:block [&_strong]:text-xs [&_small]:text-[#adb0bd] [&_small]:text-[10px] [&_em]:text-[10px] [&_em]:text-[#ffbd70] [&_em]:not-italic [&_em.yes]:text-[#4cdda4]'
+                }
+              >
+                {[
+                  ['Voice agent connected', Boolean(selectedAgent), selectedAgent],
+                  [
+                    'Greeting ready',
+                    Boolean(record?.data?.screen_9 || record?.data?.screen_8),
+                    'Welcome configured',
+                  ],
+                  [
+                    'Human handoff',
+                    Boolean(record?.data?.screen_10),
+                    'Routes to the selected team',
+                  ],
+                  [
+                    'Website added',
+                    Boolean(record?.data?.screen_11?.['Allowed website URL']),
+                    record?.data?.screen_11?.['Allowed website URL'] ||
+                      'Enter the website on screen 11',
+                  ],
+                  ['Offline fallback', Boolean(record?.data?.screen_11), 'After-hours settings'],
+                ].map(([label, isReady, description]) => (
+                  <div key={label}>
+                    <Headphones size={18} />
+                    <span>
+                      <strong>{label}</strong>
+                      <small>{description}</small>
+                    </span>
+                    <em className={isReady ? 'yes' : ''}>{isReady ? '● Ready' : 'Setup needed'}</em>
+                  </div>
+                ))}
+              </div>
+              <div
+                className={
+                  'widget-install border border-[#454250] rounded-lg p-3.25 mt-3.75 [&_h3]:m-0 [&_h3]:text-sm [&_p]:text-[11px] [&_p]:text-[#bfc0cb] [&_code]:block [&_code]:whitespace-pre-wrap [&_code]:wrap-anywhere [&_code]:bg-[#181920] [&_code]:border [&_code]:border-[#46424f] [&_code]:text-[#cbb8ff] [&_code]:p-2.5 [&_code]:text-[10px] [&_button]:text-white [&_button]:bg-[#4f3a8c] [&_button]:border [&_button]:border-[#8a64ee] [&_button]:rounded-md [&_button]:p-[8px_10px] [&_button]:mt-2.25 [&_button]:cursor-pointer [&_button]:text-[11px]'
+                }
+              >
+                <h3>Install on your website</h3>
+                <p>Use this script after publishing the demo widget.</p>
+                <code>{code}</code>
+                <button
+                  onClick={() => navigator.clipboard.writeText(code).then(() => setCopied(true))}
+                >
+                  <Clipboard size={15} /> {copied ? 'Copied' : 'Copy code'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div
+              className={`preview-browser max-w-full bg-[#fff] rounded-lg overflow-hidden min-h-100 text-[#1f2332] [&.mobile]:max-w-85 [&.mobile]:m-auto${device === 'Mobile' ? 'mobile' : ''}`}
+            >
+              <div
+                className={
+                  'browser-bar flex items-center gap-1.5 bg-[#33343a] p-2.5 [&_i]:w-2.25 [&_i]:h-2.25 [&_i]:rounded-full [&_i]:bg-[#ff6b66] [&_i:nth-child(2)]:bg-[#ffce57] [&_i:nth-child(3)]:bg-[#44db8b] [&_span]:flex-1 [&_span]:bg-[#27282d] [&_span]:rounded-[20px] [&_span]:text-[#d8dbe1] [&_span]:p-[4px_12px] [&_span]:text-[10px] [&_span]:ml-2.25'
+                }
+              >
+                <i /> <i /> <i />
+                <span>⌕ &nbsp; www.acme.com</span>
+              </div>
+              <div
+                className={
+                  'preview-site min-h-97.5 bg-[linear-gradient(150deg,_#fff_45%,_#dce0ff)] p-3.25 relative'
+                }
+              >
+                <div
+                  className={
+                    'preview-site-nav flex items-center justify-between text-[10px] [&_b]:text-[15px] [&_strong]:bg-[#673be9] [&_strong]:rounded-md [&_strong]:text-white [&_strong]:p-2.25 [&_strong]:text-[10px]'
+                  }
+                >
+                  <b>◆ Acme</b>
+                  <span>Products &nbsp;&nbsp; Solutions &nbsp;&nbsp; Pricing</span>
+                  <strong>Get started</strong>
+                </div>
+                <div
+                  className={
+                    'preview-site-hero [&_span]:bg-[#673be9] [&_span]:rounded-md [&_span]:text-white [&_span]:p-2.25 [&_span]:text-[10px] m-[75px_0_0_15px] max-w-[48%] [&_small]:text-[#7546f2] [&_small]:font-bold [&_small]:text-[9px] [&_h3]:text-[25px] [&_h3]:tracking-[-.04em] [&_h3]:leading-[1.04] [&_h3]:m-[8px_0] [&_p]:text-[10px] [&_p]:leading-normal'
+                  }
+                >
+                  <small>AI POWERED SUPPORT</small>
+                  <h3>
+                    Build something
+                    <br />
+                    extraordinary
+                  </h3>
+                  <p>Powerful AI solutions for modern businesses.</p>
+                  <span>Get started</span>
+                </div>
+                <div
+                  className={
+                    'preview-widget-card absolute right-3 bottom-4.25 w-55 bg-[white] border border-[#ddd9ef] rounded-[10px] p-3 shadow-[0_8px_30px_#918cb94a] text-center [&_header]:flex [&_header]:items-center [&_header]:gap-1.5 [&_header]:text-[11px] [&_header]:text-left [&_header_span]:text-(--preview-accent) [&_p]:text-[10px] [&_p]:text-[#535166] [&_button]:bg-(--preview-accent) [&_button]:border-0 [&_button]:rounded-md [&_button]:text-white [&_button]:w-full [&_button]:p-2.25 [&_button]:text-[10px]'
+                  }
+                  style={{ '--preview-accent': form['Accent color'] || '#7c3aed' }}
+                >
+                  <header>
+                    <span>◆</span>
+                    <strong>{form['Widget name'] || record?.title || 'Acme Voice Support'}</strong>
+                  </header>
+                  <div
+                    className={
+                      'preview-voice-orb m-[18px_auto] w-19.25 h-19.25 rounded-full grid place-items-center text-white bg-(--preview-accent) shadow-[0_0_0_7px_#e7ddff]'
+                    }
+                  >
+                    <AudioLines size={28} />
+                  </div>
+                  <p>
+                    {number === 9
+                      ? form['Welcome message'] || 'How can we help today?'
+                      : number === 10
+                        ? 'Ask the AI, or request a human specialist.'
+                        : 'Talk with our AI assistant'}
+                  </p>
+                  <button>
+                    <Phone size={15} /> Start voice conversation
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
+      <div
+        className={
+          'widget-setup-footer border border-[#3f3a46] bg-[#24232b] rounded-[9px] p-3 flex items-center justify-between gap-3 mt-3 [&>span]:text-[11px] [&>span]:text-[#aeb0bf] max-[600px]:flex-wrap'
+        }
+      >
+        <Link
+          className={
+            'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+          }
+          href={`/flow/${number === 8 ? 7 : number === 12 ? 11 : number - 1}`}
+        >
+          <ArrowLeft size={16} /> Back
+        </Link>
+        <span>
+          {number === 12
+            ? ready
+              ? 'Ready for demo publishing'
+              : 'Complete the website and agent setup to publish'
+            : 'Settings are saved as you continue.'}
+        </span>
+        <button
+          disabled={working}
+          className={
+            'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+          }
+          onClick={() =>
+            onSave({ advance: number !== 12, status: number === 12 ? 'published' : undefined })
+          }
+        >
+          {working
+            ? 'Saving…'
+            : number === 12
+              ? 'Publish voice widget'
+              : number === 11
+                ? 'Continue to test & install'
+                : 'Save & continue'}{' '}
+          <ArrowRight size={16} />
+        </button>
+      </div>
+    </div>
+  );
 }

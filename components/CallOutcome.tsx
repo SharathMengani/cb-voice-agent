@@ -1,7 +1,188 @@
 'use client';
 import Link from 'next/link';
 import { CalendarDays, CheckCircle2, Clock3, FileText, Sparkles, UserRound } from 'lucide-react';
-export default function CallOutcome({records,selected,onSelect,form,setForm,feedback,working,onSave}){
-  const ended=records.filter(r=>r.status==='ended');const call=ended.find(r=>r._id===selected?._id)||ended[0];const issue=call?.data?.screen_14?.['Issue summary']||'Customer support conversation';const set=(key,value)=>setForm(current=>({...current,[key]:value}));
-  return <div className={"call-outcome-page [max-width:1480px] [margin:auto] [display:grid] [grid-template-columns:minmax(0,_1fr)_320px] [gap:10px] [color:#f7f6ff] [&>main]:[border:1px_solid_#3e3e49] [&>main]:[border-radius:9px] [&>main]:[background:#1d1e25] [&>main]:[padding:17px] [&_aside_section]:[border:1px_solid_#3e3e49] [&_aside_section]:[border-radius:9px] [&_aside_section]:[background:#1d1e25] [&_aside_section]:[padding:17px] [&>main>h1]:[font-size:25px] [&>main>h1]:[margin:0_0_4px] [&>main>p]:[color:#b2b6c5] [&>main>p]:[font-size:12px] [&_aside_section]:[margin-bottom:9px] [&_aside_h2]:[display:flex] [&_aside_h2]:[gap:8px] [&_aside_h2]:[align-items:center] [&_aside_h2]:[font-size:15px] [&_aside>section>button]:[width:100%] [&_aside>section>button]:[text-align:left] [&_aside>section>button]:[background:#24232c] [&_aside>section>button]:[color:white] [&_aside>section>button]:[border:1px_solid_#4a4557] [&_aside>section>button]:[border-radius:8px] [&_aside>section>button]:[padding:11px] [&_aside>section>button]:[margin:4px_0] [&_aside>section>button]:[cursor:pointer] [&_aside>section>button.selected]:[border-color:#8b60e9] [&_aside>section>button.selected]:[background:#332746] [&_aside>section>button_small]:[display:block] [&_aside>section>button_small]:[color:#adafbf] [&_aside>section>button_small]:[font-size:10px] max-[1050px]:[grid-template-columns:1fr] max-[1050px]:[&_aside]:[display:grid] max-[1050px]:[&_aside]:[grid-template-columns:1fr_1fr] max-[1050px]:[&_aside]:[gap:9px] max-[650px]:[&_aside]:[grid-template-columns:1fr]"}><main><h1>Complete call outcome</h1><p>Review the call details, AI summary and add outcome information.</p><div className={"outcome-caller [display:flex] [align-items:center] [gap:15px] [border:1px_solid_#3f4049] [border-radius:8px] [padding:13px] [margin:17px_0] [&_div]:[flex:1] [&_h2]:[margin:0] [&_h2]:[font-size:19px] [&_div_span]:[font-size:11px] [&_div_span]:[color:#b6b8c7] [&_em]:[font-style:normal] [&_em]:[font-size:11px] [&_em]:[color:#3ed19b]"}><span className={"mini-avatar large [display:grid] [place-items:center] [flex:none] [width:38px] [height:38px] [background:linear-gradient(135deg,_#8a5bff,_#5531cf)] [border-radius:50%] [font-size:12px] [color:white] [font-weight:700] [&.large]:[width:59px] [&.large]:[height:59px] [&.large]:[font-size:18px]"}>{call?.title?.split(' ').map(s=>s[0]).slice(0,2).join('')||'—'}</span><div><h2>{call?.title||'No completed call selected'}</h2><span>#{call?._id?.slice(-6).toUpperCase()||'—'} · Website voice call</span></div><em>● Call ended</em></div><div className={"outcome-timeline [display:flex] [align-items:center] [justify-content:space-between] [gap:5px] [border:1px_solid_#47434e] [border-radius:8px] [padding:13px] [margin-bottom:13px] [&>div]:[text-align:center] [&>div]:[flex:1] [&>div]:[min-width:0] [&_span]:[display:grid] [&_span]:[place-items:center] [&_span]:[border-radius:50%] [&_span]:[background:#5e3bd8] [&_span]:[color:white] [&_span]:[font-size:11px] [&_span]:[width:32px] [&_span]:[height:32px] [&_span]:[margin:0_auto_7px] [&_strong]:[font-size:10px] [&_strong]:[display:block] [&_strong]:[white-space:nowrap] [&_strong]:[overflow:hidden] [&_strong]:[text-overflow:ellipsis]"}>{[['AI','AI voice agent'],['PS',call?.data?.screen_23?'First agent':'Human specialist'],[call?.data?.assignedAgent?.split(' ').map(s=>s[0]).join('')||'AG',call?.data?.assignedAgent||'Receiving agent'],['✓','Call ended']].map(([initial,label])=><div key={label}><span>{initial}</span><strong>{label}</strong></div>)}</div><section className={"outcome-card [border:1px_solid_#45434f] [border-radius:8px] [padding:13px] [margin-bottom:12px] [&_h3]:[display:flex] [&_h3]:[align-items:center] [&_h3]:[gap:8px] [&_h3]:[margin:0_0_10px] [&_h3]:[font-size:14px] [&_h3_svg]:[color:#a87afa] [&_p]:[font-size:12px] [&_p]:[background:#28303d] [&_p]:[border:1px_solid_#4c4d5c] [&_p]:[border-radius:7px] [&_p]:[padding:13px] [&_label]:[display:flex] [&_label]:[align-items:center] [&_label]:[gap:12px] [&_label]:[font-size:12px] [&_label]:[margin:12px_0] [&_label>select]:[min-width:0] [&_label>select]:[flex:1] [&_label>select]:[background:#242630] [&_label>select]:[border:1px_solid_#51505b] [&_label>select]:[border-radius:7px] [&_label>select]:[color:white] [&_label>select]:[padding:9px] [&_label>select]:[font:inherit] [&_label>select]:[font-size:12px] [&_label>textarea]:[min-width:0] [&_label>textarea]:[flex:1] [&_label>textarea]:[background:#242630] [&_label>textarea]:[border:1px_solid_#51505b] [&_label>textarea]:[border-radius:7px] [&_label>textarea]:[color:white] [&_label>textarea]:[padding:9px] [&_label>textarea]:[font:inherit] [&_label>textarea]:[font-size:12px] [&_label>input]:[min-width:0] [&_label>input]:[flex:1] [&_label>input]:[background:#242630] [&_label>input]:[border:1px_solid_#51505b] [&_label>input]:[border-radius:7px] [&_label>input]:[color:white] [&_label>input]:[padding:9px] [&_label>input]:[font:inherit] [&_label>input]:[font-size:12px] max-[650px]:[&_label]:[display:block] max-[650px]:[&_label>*]:[width:100%] max-[650px]:[&_label>*]:[display:block] max-[650px]:[&_label>*]:[margin-top:7px]"}><h3><Sparkles size={19}/> AI post-call summary · demo</h3><p>{issue}. The team reviewed the caller request. Add the final result below.</p></section><section className={"outcome-card [border:1px_solid_#45434f] [border-radius:8px] [padding:13px] [margin-bottom:12px] [&_h3]:[display:flex] [&_h3]:[align-items:center] [&_h3]:[gap:8px] [&_h3]:[margin:0_0_10px] [&_h3]:[font-size:14px] [&_h3_svg]:[color:#a87afa] [&_p]:[font-size:12px] [&_p]:[background:#28303d] [&_p]:[border:1px_solid_#4c4d5c] [&_p]:[border-radius:7px] [&_p]:[padding:13px] [&_label]:[display:flex] [&_label]:[align-items:center] [&_label]:[gap:12px] [&_label]:[font-size:12px] [&_label]:[margin:12px_0] [&_label>select]:[min-width:0] [&_label>select]:[flex:1] [&_label>select]:[background:#242630] [&_label>select]:[border:1px_solid_#51505b] [&_label>select]:[border-radius:7px] [&_label>select]:[color:white] [&_label>select]:[padding:9px] [&_label>select]:[font:inherit] [&_label>select]:[font-size:12px] [&_label>textarea]:[min-width:0] [&_label>textarea]:[flex:1] [&_label>textarea]:[background:#242630] [&_label>textarea]:[border:1px_solid_#51505b] [&_label>textarea]:[border-radius:7px] [&_label>textarea]:[color:white] [&_label>textarea]:[padding:9px] [&_label>textarea]:[font:inherit] [&_label>textarea]:[font-size:12px] [&_label>input]:[min-width:0] [&_label>input]:[flex:1] [&_label>input]:[background:#242630] [&_label>input]:[border:1px_solid_#51505b] [&_label>input]:[border-radius:7px] [&_label>input]:[color:white] [&_label>input]:[padding:9px] [&_label>input]:[font:inherit] [&_label>input]:[font-size:12px] max-[650px]:[&_label]:[display:block] max-[650px]:[&_label>*]:[width:100%] max-[650px]:[&_label>*]:[display:block] max-[650px]:[&_label>*]:[margin-top:7px]"}><h3><FileText size={19}/> Call disposition</h3><label>Disposition<select value={form.Outcome||''} onChange={e=>set('Outcome',e.target.value)}><option value="">Select outcome</option><option>Resolved</option><option>Follow-up needed</option><option>Transferred</option></select></label><label>Outcome note<textarea value={form.Summary||''} onChange={e=>set('Summary',e.target.value)} placeholder="What happened on the call?" rows={4}/></label><label>Schedule a follow-up <input type="datetime-local" value={form['Follow-up time']||''} onChange={e=>set('Follow-up time',e.target.value)}/></label></section>{feedback&&<p role="status" className={"flow-alert [display:flex] [gap:10px] [align-items:center] [background:#173b34] [border:1px_solid_#296a55] [color:#81e4b8] [padding:13px_16px] [border-radius:9px] [margin:15px_0] [font-size:14px] [&.problem]:[background:#402630] [&.problem]:[border-color:#a44c68] [&.problem]:[color:#ffb5c1]"}>{feedback}</p>}<div className={"outcome-actions [display:flex] [gap:9px]"}><button className={"button primary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} disabled={working||!call||!form.Outcome||!form.Summary?.trim()} onClick={onSave}><CheckCircle2 size={16}/> {working?'Saving…':'Save outcome & close'}</button><Link className={"button secondary [display:inline-flex] [align-items:center] [justify-content:center] [gap:9px] [border-radius:8px] [border:1px_solid_var(--line)] [height:43px] [padding:0_18px] [color:var(--text)] [font-size:14px] [white-space:nowrap] [background:var(--panel2)] [font-weight:600] [&.primary]:[border-color:#784afa] [&.primary]:[background:linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:[box-shadow:0_4px_18px_#511fc533] [&.primary:hover]:[filter:brightness(1.14)] [&.secondary:hover]:[border-color:#8561dd] [&.subtle:hover]:[border-color:#8561dd] [&.small]:[height:35px] [&.small]:[padding:0_13px] [&.subtle]:[background:#272832] [font-weight:590]"} href="/flow/21">Back to inbox</Link></div></main><aside><section><h2><UserRound size={18}/> Customer profile</h2>{[['Name',call?.title],['Conversation ID',call?._id?.slice(-6).toUpperCase()],['AI voice agent','Website Support'],['Department',call?.data?.screen_14?.Department||'Technical Support'],['Language','English (India)']].map(([key,value])=><div className={"detail-line [display:flex] [justify-content:space-between] [gap:16px] [padding:12px_0] [border-top:1px_solid_#42414a] [font-size:12px] [&_span]:[color:#b6b7c6] [&_strong]:[max-width:60%] [&_strong]:[font-weight:500] [&_strong]:[text-align:right]"} key={key}><span>{key}</span><strong>{value||'—'}</strong></div>)}</section><section><h2><Clock3 size={18}/> Recent completed calls</h2>{ended.map(item=><button key={item._id} className={(item._id===call?._id?'selected':'')} onClick={()=>onSelect(item)}>{item.title}<small>#{item._id.slice(-6).toUpperCase()}</small></button>)}</section></aside></div>;
+export default function CallOutcome({
+  records,
+  selected,
+  onSelect,
+  form,
+  setForm,
+  feedback,
+  working,
+  onSave,
+}) {
+  const ended = records.filter((r) => r.status === 'ended');
+  const call = ended.find((r) => r._id === selected?._id) || ended[0];
+  const issue = call?.data?.screen_14?.['Issue summary'] || 'Customer support conversation';
+  const set = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+  return (
+    <div
+      className={
+        'call-outcome-page max-w-370 m-auto grid grid-cols-[minmax(0,1fr)_320px] gap-2.5 text-[#f7f6ff] [&>main]:border [&>main]:border-[#3e3e49] [&>main]:rounded-[9px] [&>main]:bg-[#1d1e25] [&>main]:p-4.25 [&_aside_section]:border [&_aside_section]:border-[#3e3e49] [&_aside_section]:rounded-[9px] [&_aside_section]:bg-[#1d1e25] [&_aside_section]:p-4.25 [&>main>h1]:text-[25px] [&>main>h1]:m-[0_0_4px] [&>main>p]:text-[#b2b6c5] [&>main>p]:text-xs [&_aside_section]:mb-2.25 [&_aside_h2]:flex [&_aside_h2]:gap-2 [&_aside_h2]:items-center [&_aside_h2]:text-[15px] [&_aside>section>button]:w-full [&_aside>section>button]:text-left [&_aside>section>button]:bg-[#24232c] [&_aside>section>button]:text-white [&_aside>section>button]:border [&_aside>section>button]:border-[#4a4557] [&_aside>section>button]:rounded-lg [&_aside>section>button]:p-2.75 [&_aside>section>button]:m-[4px_0] [&_aside>section>button]:cursor-pointer [&_aside>section>button.selected]:border-[#8b60e9] [&_aside>section>button.selected]:bg-[#332746] [&_aside>section>button_small]:block [&_aside>section>button_small]:text-[#adafbf] [&_aside>section>button_small]:text-[10px] max-[1050px]:grid-cols-1 max-[1050px]:[&_aside]:grid max-[1050px]:[&_aside]:grid-cols-[1fr_1fr] max-[1050px]:[&_aside]:gap-2.25 max-[650px]:[&_aside]:grid-cols-1'
+      }
+    >
+      <main>
+        <h1>Complete call outcome</h1>
+        <p>Review the call details, AI summary and add outcome information.</p>
+        <div
+          className={
+            'outcome-caller flex items-center gap-3.75 border border-[#3f4049] rounded-lg p-3.25 m-[17px_0] [&_div]:flex-1 [&_h2]:m-0 [&_h2]:text-[19px] [&_div_span]:text-[11px] [&_div_span]:text-[#b6b8c7] [&_em]:not-italic [&_em]:text-[11px] [&_em]:text-[#3ed19b]'
+          }
+        >
+          <span
+            className={
+              'mini-avatar large grid place-items-center flex-none w-9.5 h-9.5 bg-[linear-gradient(135deg,#8a5bff,#5531cf)] rounded-full text-xs text-white font-bold [&.large]:w-14.75 [&.large]:h-14.75 [&.large]:text-lg'
+            }
+          >
+            {call?.title
+              ?.split(' ')
+              .map((s) => s[0])
+              .slice(0, 2)
+              .join('') || '—'}
+          </span>
+          <div>
+            <h2>{call?.title || 'No completed call selected'}</h2>
+            <span>#{call?._id?.slice(-6).toUpperCase() || '—'} · Website voice call</span>
+          </div>
+          <em>● Call ended</em>
+        </div>
+        <div
+          className={
+            'outcome-timeline flex items-center justify-between gap-1.25 border border-[#47434e] rounded-lg p-3.25 mb-3.25 [&>div]:text-center [&>div]:flex-1 [&>div]:min-w-0 [&_span]:grid [&_span]:place-items-center [&_span]:rounded-full [&_span]:bg-[#5e3bd8] [&_span]:text-white [&_span]:text-[11px] [&_span]:w-8 [&_span]:h-8 [&_span]:m-[0_auto_7px] [&_strong]:text-[10px] [&_strong]:block [&_strong]:whitespace-nowrap [&_strong]:overflow-hidden [&_strong]:text-ellipsis'
+          }
+        >
+          {[
+            ['AI', 'AI voice agent'],
+            ['PS', call?.data?.screen_23 ? 'First agent' : 'Human specialist'],
+            [
+              call?.data?.assignedAgent
+                ?.split(' ')
+                .map((s) => s[0])
+                .join('') || 'AG',
+              call?.data?.assignedAgent || 'Receiving agent',
+            ],
+            ['✓', 'Call ended'],
+          ].map(([initial, label]) => (
+            <div key={label}>
+              <span>{initial}</span>
+              <strong>{label}</strong>
+            </div>
+          ))}
+        </div>
+        <section
+          className={
+            'outcome-card border border-[#45434f] rounded-lg p-3.25 mb-3 [&_h3]:flex [&_h3]:items-center [&_h3]:gap-2 [&_h3]:m-[0_0_10px] [&_h3]:text-sm [&_h3_svg]:text-[#a87afa] [&_p]:text-xs [&_p]:bg-[#28303d] [&_p]:border [&_p]:border-[#4c4d5c] [&_p]:rounded-[7px] [&_p]:p-3.25 [&_label]:flex [&_label]:items-center [&_label]:gap-3 [&_label]:text-xs [&_label]:m-[12px_0] [&_label>select]:min-w-0 [&_label>select]:flex-1 [&_label>select]:bg-[#242630] [&_label>select]:border [&_label>select]:border-[#51505b] [&_label>select]:rounded-[7px] [&_label>select]:text-white [&_label>select]:p-2.25 [&_label>select]:[font:inherit] [&_label>select]:text-xs [&_label>textarea]:min-w-0 [&_label>textarea]:flex-1 [&_label>textarea]:bg-[#242630] [&_label>textarea]:border [&_label>textarea]:border-[#51505b] [&_label>textarea]:rounded-[7px] [&_label>textarea]:text-white [&_label>textarea]:p-2.25 [&_label>textarea]:[font:inherit] [&_label>textarea]:text-xs [&_label>input]:min-w-0 [&_label>input]:flex-1 [&_label>input]:bg-[#242630] [&_label>input]:border [&_label>input]:border-[#51505b] [&_label>input]:rounded-[7px] [&_label>input]:text-white [&_label>input]:p-2.25 [&_label>input]:[font:inherit] [&_label>input]:text-xs max-[650px]:[&_label]:block max-[650px]:[&_label>*]:w-full max-[650px]:[&_label>*]:block max-[650px]:[&_label>*]:mt-1.75'
+          }
+        >
+          <h3>
+            <Sparkles size={19} /> AI post-call summary · demo
+          </h3>
+          <p>{issue}. The team reviewed the caller request. Add the final result below.</p>
+        </section>
+        <section
+          className={
+            'outcome-card border border-[#45434f] rounded-lg p-3.25 mb-3 [&_h3]:flex [&_h3]:items-center [&_h3]:gap-2 [&_h3]:m-[0_0_10px] [&_h3]:text-sm [&_h3_svg]:text-[#a87afa] [&_p]:text-xs [&_p]:bg-[#28303d] [&_p]:border [&_p]:border-[#4c4d5c] [&_p]:rounded-[7px] [&_p]:p-3.25 [&_label]:flex [&_label]:items-center [&_label]:gap-3 [&_label]:text-xs [&_label]:m-[12px_0] [&_label>select]:min-w-0 [&_label>select]:flex-1 [&_label>select]:bg-[#242630] [&_label>select]:border [&_label>select]:border-[#51505b] [&_label>select]:rounded-[7px] [&_label>select]:text-white [&_label>select]:p-2.25 [&_label>select]:[font:inherit] [&_label>select]:text-xs [&_label>textarea]:min-w-0 [&_label>textarea]:flex-1 [&_label>textarea]:bg-[#242630] [&_label>textarea]:border [&_label>textarea]:border-[#51505b] [&_label>textarea]:rounded-[7px] [&_label>textarea]:text-white [&_label>textarea]:p-2.25 [&_label>textarea]:[font:inherit] [&_label>textarea]:text-xs [&_label>input]:min-w-0 [&_label>input]:flex-1 [&_label>input]:bg-[#242630] [&_label>input]:border [&_label>input]:border-[#51505b] [&_label>input]:rounded-[7px] [&_label>input]:text-white [&_label>input]:p-2.25 [&_label>input]:[font:inherit] [&_label>input]:text-xs max-[650px]:[&_label]:block max-[650px]:[&_label>*]:w-full max-[650px]:[&_label>*]:block max-[650px]:[&_label>*]:mt-1.75'
+          }
+        >
+          <h3>
+            <FileText size={19} /> Call disposition
+          </h3>
+          <label>
+            Disposition
+            <select value={form.Outcome || ''} onChange={(e) => set('Outcome', e.target.value)}>
+              <option value="">Select outcome</option>
+              <option>Resolved</option>
+              <option>Follow-up needed</option>
+              <option>Transferred</option>
+            </select>
+          </label>
+          <label>
+            Outcome note
+            <textarea
+              value={form.Summary || ''}
+              onChange={(e) => set('Summary', e.target.value)}
+              placeholder="What happened on the call?"
+              rows={4}
+            />
+          </label>
+          <label>
+            Schedule a follow-up{' '}
+            <input
+              type="datetime-local"
+              value={form['Follow-up time'] || ''}
+              onChange={(e) => set('Follow-up time', e.target.value)}
+            />
+          </label>
+        </section>
+        {feedback && (
+          <p
+            role="status"
+            className={
+              'flow-alert flex gap-2.5 items-center bg-[#173b34] border border-[#296a55] text-[#81e4b8] p-[13px_16px] rounded-[9px] m-[15px_0] text-sm [&.problem]:bg-[#402630] [&.problem]:border-[#a44c68] [&.problem]:text-[#ffb5c1]'
+            }
+          >
+            {feedback}
+          </p>
+        )}
+        <div className={'outcome-actions flex gap-2.25'}>
+          <button
+            className={
+              'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+            }
+            disabled={working || !call || !form.Outcome || !form.Summary?.trim()}
+            onClick={onSave}
+          >
+            <CheckCircle2 size={16} /> {working ? 'Saving…' : 'Save outcome & close'}
+          </button>
+          <Link
+            className={
+              'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
+            }
+            href="/flow/21"
+          >
+            Back to inbox
+          </Link>
+        </div>
+      </main>
+      <aside>
+        <section>
+          <h2>
+            <UserRound size={18} /> Customer profile
+          </h2>
+          {[
+            ['Name', call?.title],
+            ['Conversation ID', call?._id?.slice(-6).toUpperCase()],
+            ['AI voice agent', 'Website Support'],
+            ['Department', call?.data?.screen_14?.Department || 'Technical Support'],
+            ['Language', 'English (India)'],
+          ].map(([key, value]) => (
+            <div
+              className={
+                'detail-line flex justify-between gap-4 p-[12px_0] border-t border-t-[#42414a] text-xs [&_span]:text-[#b6b7c6] [&_strong]:max-w-[60%] [&_strong]:font-medium [&_strong]:text-right'
+              }
+              key={key}
+            >
+              <span>{key}</span>
+              <strong>{value || '—'}</strong>
+            </div>
+          ))}
+        </section>
+        <section>
+          <h2>
+            <Clock3 size={18} /> Recent completed calls
+          </h2>
+          {ended.map((item) => (
+            <button
+              key={item._id}
+              className={item._id === call?._id ? 'selected' : ''}
+              onClick={() => onSelect(item)}
+            >
+              {item.title}
+              <small>#{item._id.slice(-6).toUpperCase()}</small>
+            </button>
+          ))}
+        </section>
+      </aside>
+    </div>
+  );
 }

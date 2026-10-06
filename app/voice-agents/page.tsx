@@ -1,2 +1,4 @@
 import VoiceAgentsList from '../../components/VoiceAgentsList';
-export default function Page() { return <VoiceAgentsList/>; }
+export default function Page() {
+  return <VoiceAgentsList />;
+}
