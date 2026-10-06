@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -31,7 +32,7 @@ import {
   Volume2,
 } from 'lucide-react';
 import Shell from './Shell';
-import { groups, screens } from './flow-data';
+import { screens } from './flow-data';
 import { apiFetch } from './api-client';
 import DemoControls from './DemoControls';
 import CustomerWidget from './CustomerWidget';
@@ -53,35 +54,6 @@ import CampaignWizard from './CampaignWizard';
 import OutboundHandoff from './OutboundHandoff';
 
 const API = '';
-const nextNumber = (number) => (number < 51 ? number + 1 : 43);
-const workflowNext = (number) => ({ 24: 27, 26: 24 })[number] || nextNumber(number);
-const groupFor = (number) => groups.find((g) => number >= g.first && number <= g.last);
-const navigationFor = (number) =>
-  ({
-    14: '/flow/14',
-    15: '/flow/15',
-    16: '/flow/15',
-    17: '/flow/17',
-    18: '/flow/18',
-    19: '/flow/19',
-    20: '/flow/20',
-    22: '/flow/21',
-    23: '/flow/21',
-    25: '/flow/26',
-    26: '/flow/26',
-    27: '/flow/27',
-    40: '/flow/40',
-    41: '/flow/41',
-  })[number] ||
-  (number >= 43
-    ? '/flow/43'
-    : number >= 34
-      ? '/voice-agents'
-      : number >= 21
-        ? '/flow/21'
-        : number >= 13
-          ? '/flow/13'
-          : '/flow/7');
 const defaults = {
   'Widget name': 'Website Voice Support',
   'Voice agent': 'Website Support',
@@ -173,9 +145,9 @@ function ConfigField({ field, value, onChange, agents }) {
   );
 }
 
-export default function FlowScreen({ number }) {
-  const config = screens[number];
-  const group = groupFor(number);
+export default function FlowScreen({ view, nextHref, previousHref, activeHref }) {
+  const config = screens[view];
+  const group = { name: config.group };
   const router = useRouter();
   const [records, setRecords] = useState([]);
   const [agents, setAgents] = useState([]);
@@ -189,14 +161,24 @@ export default function FlowScreen({ number }) {
   const [embedOrigin, setEmbedOrigin] = useState('http://localhost:3000');
   const [widgetToken, setWidgetToken] = useState('');
   const [widgetId, setWidgetId] = useState('');
-  const preferred = number === 26 ? 'transfer-pending' : number === 27 ? 'ended' : null;
+  const preferred =
+    view === 'accept-transfer' ? 'transfer-pending' : view === 'call-outcome' ? 'ended' : null;
   const record = preferred
     ? records.find((r) => r._id === selection && r.status === preferred) ||
       records.find((r) => r.status === preferred) ||
       records[0]
     : records.find((r) => r._id === selection) || records[0];
-  const groupStart = group.first;
-  const workspace = number >= 21 && number <= 27 ? 'agent' : 'owner';
+  const workspace = [
+    'agent-inbox',
+    'incoming-call',
+    'call-review',
+    'live-call',
+    'transfer-call',
+    'accept-transfer',
+    'call-outcome',
+  ].includes(view)
+    ? 'agent'
+    : 'owner';
   useEffect(() => {
     setFeedback('');
     setShowSnippet(false);
@@ -291,9 +273,17 @@ export default function FlowScreen({ number }) {
           typeof window !== 'undefined' ? localStorage.getItem(`chatbucket:${config.kind}`) : null;
         const active = entries.find((entry) => entry._id === stored) || entries[0];
         setSelection(active?._id || '');
-        const settings = active?.data?.[`screen_${number}`] || initialForm(config);
+        const settings = active?.data?.[config.storageKey] || initialForm(config);
         setForm(
-          config.kind === 'agent' && number >= 34 && number <= 39
+          config.kind === 'agent' &&
+            [
+              'agent-instructions',
+              'agent-knowledge',
+              'agent-actions',
+              'agent-advanced',
+              'agent-quality',
+              'agent-versions',
+            ].includes(view)
             ? { 'Voice agent': agentItems[0]?.name || '', ...settings }
             : settings,
         );
@@ -304,7 +294,7 @@ export default function FlowScreen({ number }) {
     return () => {
       cancelled = true;
     };
-  }, [number, config.kind]);
+  }, [view, config.kind]);
   useEffect(() => {
     if (config.type === 'customer') {
       if (!widgetToken || !record?._id) return;
@@ -339,7 +329,7 @@ export default function FlowScreen({ number }) {
   }, [config.kind, config.type, widgetToken, record?._id]);
   function choose(entry) {
     setSelection(entry._id);
-    setForm(entry.data?.[`screen_${number}`] || {});
+    setForm(entry.data?.[config.storageKey] || {});
     localStorage.setItem(`chatbucket:${config.kind}`, entry._id);
   }
   async function refresh() {
@@ -356,18 +346,18 @@ export default function FlowScreen({ number }) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Widget-Session': widgetToken },
           body: JSON.stringify({
-            kind: number === 32 ? 'callback' : 'rating',
-            form: { ...form, ...(number === 33 && !form.Rating ? { Rating: '5' } : {}) },
+            kind: view === 'customer-callback' ? 'callback' : 'rating',
+            form: { ...form, ...(view === 'call-rating' && !form.Rating ? { Rating: '5' } : {}) },
           }),
         });
         const result = await response.json();
         if (!response.ok) throw Error(result.error || 'Could not save.');
-        setFeedback(number === 32 ? 'Callback requested.' : 'Rating submitted.');
+        setFeedback(view === 'customer-callback' ? 'Callback requested.' : 'Rating submitted.');
         return;
       }
       if (config.kind === 'agent' && !agents.some((agent) => agent.name === form['Voice agent']))
         throw Error('Select an existing voice agent first.');
-      let target = [32, 33].includes(number) ? null : record;
+      let target = ['customer-callback', 'call-rating'].includes(view) ? null : record;
       if (!target) {
         const title = String(
           form['Widget name'] ||
@@ -379,7 +369,7 @@ export default function FlowScreen({ number }) {
         const created = await apiFetch(`${API}/api/records/${config.kind}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, data: { [`screen_${number}`]: form } }),
+          body: JSON.stringify({ title, data: { [config.storageKey]: form } }),
         });
         const result = await created.json();
         if (!created.ok) throw Error(result.error || 'Could not create record.');
@@ -393,9 +383,9 @@ export default function FlowScreen({ number }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             data: {
-              [`screen_${number}`]: form,
-              ...(number === 23 ? { assignedAgent: 'Priya Sharma' } : {}),
-              ...(number === 26
+              [config.storageKey]: form,
+              ...(view === 'call-review' ? { assignedAgent: 'Priya Sharma' } : {}),
+              ...(view === 'accept-transfer'
                 ? {
                     assignedAgent:
                       target.data?.screen_25?.['Transfer to agent'] || 'Receiving specialist',
@@ -422,17 +412,20 @@ export default function FlowScreen({ number }) {
         setRecords((current) => current.map((r) => (r._id === updated._id ? updated : r)));
       }
       if (config.kind === 'widget' && status === 'published') setShowSnippet(true);
-      if (config.kind === 'agent' && number >= 34 && number <= 37) {
+      if (
+        config.kind === 'agent' &&
+        ['agent-instructions', 'agent-knowledge', 'agent-actions', 'agent-advanced'].includes(view)
+      ) {
         const voiceAgent = agents.find((agent) => agent.name === form['Voice agent']);
         let patch = {};
-        if (number === 34)
+        if (view === 'agent-instructions')
           patch = {
             instructions: [form['Agent instructions'], form['System prompt']]
               .filter(Boolean)
               .join('\n\n'),
             ...(form['Opening statement'] ? { greeting: form['Opening statement'] } : {}),
           };
-        if (number === 35) {
+        if (view === 'agent-knowledge') {
           const sources = [...(voiceAgent.knowledgeSources || [])];
           if (
             form['Website URL'] &&
@@ -463,7 +456,7 @@ export default function FlowScreen({ number }) {
           }
           patch = { knowledgeSources: sources };
         }
-        if (number === 36)
+        if (view === 'agent-actions')
           patch = {
             actions: {
               accountLookup: Boolean(form['Account lookup']),
@@ -471,7 +464,7 @@ export default function FlowScreen({ number }) {
             },
             confirmTicket: Boolean(form['Require confirmation']),
           };
-        if (number === 37)
+        if (view === 'agent-advanced')
           patch = {
             ...(form['Speaking speed'] ? { speakingSpeed: form['Speaking speed'] } : {}),
             ...(form['Silence prompt (seconds)']
@@ -493,19 +486,19 @@ export default function FlowScreen({ number }) {
       setFeedback(
         `${config.title} saved${status ? ` · ${friendlyStatus[status] || status}` : ''}.`,
       );
-      if (advance) router.push(`/flow/${workflowNext(number)}`);
+      if (advance) router.push(nextHref);
     } catch (error) {
       setFeedback(error.message);
     } finally {
       setWorking(false);
     }
   }
-  const customerPath = (value) => {
+  const customerPath = (href) => {
     const origin =
       typeof window !== 'undefined' && widgetId
         ? sessionStorage.getItem(`chatbucket:widget-origin:${widgetId}`)
         : '';
-    return `/flow/${value}${widgetId ? `?widget=${encodeURIComponent(widgetId)}${origin ? `&origin=${encodeURIComponent(origin)}` : ''}` : ''}`;
+    return `${href}${widgetId ? `?widget=${encodeURIComponent(widgetId)}${origin ? `&origin=${encodeURIComponent(origin)}` : ''}` : ''}`;
   };
   async function requestMic() {
     try {
@@ -513,25 +506,26 @@ export default function FlowScreen({ number }) {
       stream.getTracks().forEach((track) => track.stop());
       setMicrophone(true);
       setFeedback('Microphone access granted for this browser.');
-      router.push(customerPath(29));
+      router.push(customerPath('/customer/ai-conversation'));
     } catch {
       setFeedback('Microphone access was not granted. Check browser permission to continue.');
     }
   }
   async function primary() {
-    if (number === 28) return requestMic();
-    if (number === 30) {
-      if (record?.status === 'human') return router.push(customerPath(31));
+    if (view === 'customer-call') return requestMic();
+    if (view === 'connecting') {
+      if (record?.status === 'human')
+        return router.push(customerPath('/customer/human-conversation'));
       return setFeedback('Still waiting for an agent. You can leave a callback request below.');
     }
-    if (number === 31 && record?.status !== 'human')
+    if (view === 'human-conversation' && record?.status !== 'human')
       return setFeedback(
         'The human agent has not joined yet. You can return to the waiting screen.',
       );
-    if (number === 42) return router.push('/flow/40');
-    if (number === 51) return router.push('/flow/43');
-    if (number === 32 || number === 33) return save();
-    if (number === 29) {
+    if (view === 'inbound-call') return router.push('/voice-agents/studio/inbound');
+    if (view === 'campaign-results') return router.push('/campaigns');
+    if (view === 'customer-callback' || view === 'call-rating') return save();
+    if (view === 'ai-conversation') {
       setWorking(true);
       try {
         if (!widgetToken) throw Error('Widget is loading. Try again.');
@@ -546,7 +540,7 @@ export default function FlowScreen({ number }) {
         const call = await response.json();
         if (!response.ok) throw Error(call.error || 'Could not start the demo request');
         sessionStorage.setItem(`chatbucket:customer-call:${widgetId}`, call._id);
-        router.push(customerPath(30));
+        router.push(customerPath('/customer/connecting'));
       } catch (error) {
         setFeedback(error.message);
       } finally {
@@ -554,11 +548,23 @@ export default function FlowScreen({ number }) {
       }
       return;
     }
-    if (number === 7 || number === 43) return save({ advance: true });
-    if ([13, 14, 15, 17, 19, 20, 21, 22, 49].includes(number))
-      return router.push(`/flow/${nextNumber(number)}`);
-    const status = config.transition || (number === 12 ? 'published' : undefined);
-    await save({ advance: number !== 12, status });
+    if (view === 'widgets' || view === 'campaigns') return save({ advance: true });
+    if (
+      [
+        'dashboard',
+        'inbox',
+        'live-calls',
+        'call-history',
+        'reviews',
+        'transfers',
+        'agent-inbox',
+        'incoming-call',
+        'campaign-monitoring',
+      ].includes(view)
+    )
+      return router.push(nextHref);
+    const status = config.transition || (view === 'widget-publish' ? 'published' : undefined);
+    await save({ advance: view !== 'widget-publish', status });
   }
   const visibleRecords = records.filter((item) =>
     `${item.title} ${item.status}`.toLowerCase().includes(search.toLowerCase()),
@@ -572,25 +578,25 @@ export default function FlowScreen({ number }) {
       >
         <Link
           href={
-            number >= 43
-              ? '/flow/43'
-              : number >= 34
+            config.group === 'Outbound campaigns'
+              ? '/campaigns'
+              : config.group === 'Agent Studio & inbound'
                 ? '/voice-agents'
-                : number >= 21
-                  ? '/flow/21'
-                  : number >= 13
-                    ? '/flow/13'
-                    : '/flow/7'
+                : config.group === 'Human Agent workspace'
+                  ? '/agent/inbox'
+                  : config.group === 'Owner workspace'
+                    ? '/dashboard'
+                    : '/widgets/overview'
           }
         >
           ←{' '}
-          {number >= 43
+          {config.group === 'Outbound campaigns'
             ? 'Campaigns'
-            : number >= 34
+            : config.group === 'Agent Studio & inbound'
               ? 'Voice agents'
-              : number >= 21
+              : config.group === 'Human Agent workspace'
                 ? 'Inbox'
-                : number >= 13
+                : config.group === 'Owner workspace'
                   ? 'Voice overview'
                   : 'Voice Widgets'}
         </Link>
@@ -615,22 +621,6 @@ export default function FlowScreen({ number }) {
           </span>
         )}
       </div>
-      {((number >= 34 && number <= 39) || (number >= 44 && number <= 48)) && (
-        <div
-          className={
-            'flow-steps flex gap-2 overflow-x-auto m-[24px_0] [scrollbar-color:#5d4b7a_#24232e] [&_a]:flex [&_a]:flex-col [&_a]:gap-1.5 [&_a]:flex-none [&_a]:min-w-30 [&_a]:max-w-41.25 [&_a]:text-[#b0aabe] [&_a]:p-3 [&_a]:border [&_a]:border-(--line) [&_a]:rounded-[9px] [&_a]:bg-[#1c1b24] [&_a]:font-bold [&_a]:text-[13px] [&_a_span]:font-normal [&_a_span]:whitespace-nowrap [&_a_span]:text-ellipsis [&_a_span]:overflow-hidden [&_a.active]:bg-[#49317c] [&_a.active]:border-[#9e75fa] [&_a.active]:text-white max-[650px]:[&_a]:min-w-22.5'
-          }
-        >
-          {Array.from({ length: number <= 39 ? 6 : 5 }, (_, i) => i + (number <= 39 ? 34 : 44)).map(
-            (n) => (
-              <Link className={n === number ? 'active' : ''} key={n} href={`/flow/${n}`}>
-                {String(n - (number <= 39 ? 33 : 43)).padStart(2, '0')}
-                <span>{screens[n].title}</span>
-              </Link>
-            ),
-          )}
-        </div>
-      )}
       {feedback && (
         <div
           role="status"
@@ -662,14 +652,14 @@ export default function FlowScreen({ number }) {
                 <div>
                   <span>{label}</span>
                   <strong>
-                    {number === 49
+                    {view === 'campaign-monitoring'
                       ? ([
                           record?.data?.stats?.eligible,
                           record?.data?.stats?.initiated,
                           record?.data?.stats?.connected,
                           record?.data?.stats?.queued,
                         ][index] ?? 0)
-                      : number === 13 && index === 1
+                      : view === 'dashboard' && index === 1
                         ? records.filter((r) => r.status === 'waiting').length
                         : records.filter((r) =>
                             index === 0
@@ -739,9 +729,9 @@ export default function FlowScreen({ number }) {
                 </span>
                 <div>
                   <h2>
-                    {number === 13
+                    {view === 'dashboard'
                       ? 'Team availability'
-                      : number === 49
+                      : view === 'campaign-monitoring'
                         ? 'Campaign status'
                         : 'Activity summary'}
                   </h2>
@@ -896,7 +886,7 @@ export default function FlowScreen({ number }) {
               </div>
             </div>
             <DataFields fields={config.fields} form={form} setForm={setForm} agents={agents} />
-            {number === 12 && (showSnippet || record?.status === 'published') && (
+            {view === 'widget-publish' && (showSnippet || record?.status === 'published') && (
               <div
                 className={
                   'install-snippet grid gap-2.5 mt-6.25 text-[#c9c2df] [&_code]:whitespace-normal [&_code]:break-all [&_code]:border [&_code]:border-[#6951a6] [&_code]:bg-[#241b39] [&_code]:p-3 [&_code]:rounded-lg [&_small]:text-[#a7a2b5]'
@@ -943,7 +933,7 @@ export default function FlowScreen({ number }) {
                 <ShieldCheck size={20} />
               </span>
               <div>
-                <h2>{number === 48 ? 'Launch checklist' : 'Live preview'}</h2>
+                <h2>{view === 'campaign-review' ? 'Launch checklist' : 'Live preview'}</h2>
                 <p>Saved settings and prerequisites</p>
               </div>
             </div>
@@ -987,10 +977,10 @@ export default function FlowScreen({ number }) {
               </div>
               <div>
                 <span>Setup step</span>
-                <strong>{number} / 51</strong>
+                <strong>{config.title}</strong>
               </div>
             </div>
-            {number === 48 && (
+            {view === 'campaign-review' && (
               <p
                 className={
                   'callout flex gap-2.75 items-start bg-[#29243b] text-[#d2c2f5] border border-[#493b69] rounded-[9px] p-3.75 m-[19px_0] text-sm leading-normal [&_svg]:flex-none'
@@ -1117,7 +1107,7 @@ export default function FlowScreen({ number }) {
           </span>
           <h2>{config.title}</h2>
           <p>{config.caption}</p>
-          {number === 29 && (
+          {view === 'ai-conversation' && (
             <div
               className={
                 'bubble max-w-[85%] text-left bg-[#2b2b37] border border-[#3d3d49] p-[13px_17px] rounded-xl m-[14px_0_0_auto] leading-normal text-sm [&.reply]:bg-[#5234ae] [&.reply]:border-[#6140d6] [&.reply]:ml-auto [&.reply]:max-w-[70%]'
@@ -1126,7 +1116,7 @@ export default function FlowScreen({ number }) {
               Hello, welcome to Acme Support. How can I help you?
             </div>
           )}
-          {number === 30 && (
+          {view === 'connecting' && (
             <div
               className={
                 'callout flex gap-2.75 items-start bg-[#29243b] text-[#d2c2f5] border border-[#493b69] rounded-[9px] p-3.75 m-[19px_0] text-sm leading-normal [&_svg]:flex-none'
@@ -1136,7 +1126,7 @@ export default function FlowScreen({ number }) {
               you prefer.
             </div>
           )}
-          {number === 31 && (
+          {view === 'human-conversation' && (
             <div
               className={
                 'callout flex gap-2.75 items-start bg-[#29243b] text-[#d2c2f5] border border-[#493b69] rounded-[9px] p-3.75 m-[19px_0] text-sm leading-normal [&_svg]:flex-none'
@@ -1148,7 +1138,7 @@ export default function FlowScreen({ number }) {
                 : 'Waiting for an agent to accept the call.'}
             </div>
           )}
-          {number === 42 && (
+          {view === 'inbound-call' && (
             <div
               className={
                 'callout flex gap-2.75 items-start bg-[#29243b] text-[#d2c2f5] border border-[#493b69] rounded-[9px] p-3.75 m-[19px_0] text-sm leading-normal [&_svg]:flex-none'
@@ -1159,17 +1149,17 @@ export default function FlowScreen({ number }) {
             </div>
           )}
           <DataFields fields={config.fields} form={form} setForm={setForm} agents={agents} />
-          {number === 28 && (
+          {view === 'customer-call' && (
             <p className={'helper-text text-[#a4a1b4] text-xs leading-[1.6] m-[8px_0]'}>
               Your browser will ask for microphone permission. Access stops if you close the call.
             </p>
           )}
-          {number === 30 && (
+          {view === 'connecting' && (
             <Link
               className={
                 'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
               }
-              href="/flow/32"
+              href="/customer/callback"
             >
               Leave a callback request
             </Link>
@@ -1177,13 +1167,7 @@ export default function FlowScreen({ number }) {
         </div>
       ) : null}
       {process.env.NEXT_PUBLIC_DEMO_MODE === 'true' && (
-        <DemoControls
-          number={number}
-          record={record}
-          form={form}
-          agents={agents}
-          onUpdate={refresh}
-        />
+        <DemoControls view={view} record={record} form={form} agents={agents} onUpdate={refresh} />
       )}
       {config.hints?.length ? (
         <div
@@ -1205,19 +1189,7 @@ export default function FlowScreen({ number }) {
         }
       >
         <Link
-          href={
-            number >= 44
-              ? number === 44
-                ? '/flow/43'
-                : `/flow/${number - 1}`
-              : number >= 34
-                ? number === 34
-                  ? '/voice-agents'
-                  : `/flow/${number - 1}`
-                : number >= 21
-                  ? '/flow/21'
-                  : '/flow/13'
-          }
+          href={previousHref}
           className={
             'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
           }
@@ -1229,11 +1201,22 @@ export default function FlowScreen({ number }) {
             'flow-footer-actions flex gap-2.25 flex-wrap max-[650px]:w-full max-[650px]:justify-end'
           }
         >
-          {![13, 14, 15, 17, 19, 20, 21, 22, 43, 49].includes(number) &&
-            number !== 28 &&
-            number !== 30 &&
-            number !== 42 &&
-            number !== 51 && (
+          {![
+            'dashboard',
+            'inbox',
+            'live-calls',
+            'call-history',
+            'reviews',
+            'transfers',
+            'agent-inbox',
+            'incoming-call',
+            'campaigns',
+            'campaign-monitoring',
+          ].includes(view) &&
+            view !== 'customer-call' &&
+            view !== 'connecting' &&
+            view !== 'inbound-call' &&
+            view !== 'campaign-results' && (
               <button
                 className={
                   'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
@@ -1260,7 +1243,7 @@ export default function FlowScreen({ number }) {
   if (config.type === 'customer')
     return (
       <CustomerWidget
-        number={number}
+        view={view}
         config={config}
         record={record}
         form={form}
@@ -1273,17 +1256,27 @@ export default function FlowScreen({ number }) {
         widgetId={widgetId}
       />
     );
-  if (number === 13)
+  if (view === 'dashboard')
     return (
-      <Shell workspace="owner" active="/flow/13">
+      <Shell workspace="owner" active="/dashboard">
         <OwnerOverview records={records} onSelect={choose} onUpdate={refresh} />
       </Shell>
     );
-  if (number >= 14 && number <= 20)
+  if (
+    [
+      'inbox',
+      'live-calls',
+      'call-takeover',
+      'call-history',
+      'callbacks',
+      'reviews',
+      'transfers',
+    ].includes(view)
+  )
     return (
-      <Shell workspace="owner" active={navigationFor(number)}>
+      <Shell workspace="owner" active={activeHref}>
         <OwnerWorkspace
-          number={number}
+          view={view}
           records={records}
           selected={record}
           onSelect={choose}
@@ -1291,29 +1284,38 @@ export default function FlowScreen({ number }) {
         />
       </Shell>
     );
-  if (number === 21)
+  if (view === 'agent-inbox')
     return (
-      <Shell workspace="agent" active="/flow/21">
+      <Shell workspace="agent" active="/agent/inbox">
         <AgentInbox records={records} selected={record} onSelect={choose} />
       </Shell>
     );
-  if (number === 7)
+  if (view === 'widgets')
     return (
-      <Shell workspace="owner" active="/flow/7">
+      <Shell workspace="owner" active="/widgets/overview">
         <WidgetList records={records} agents={agents} onUpdate={refresh} />
       </Shell>
     );
-  if (number === 43)
+  if (view === 'campaigns')
     return (
-      <Shell workspace="owner" active="/flow/43">
+      <Shell workspace="owner" active="/campaigns">
         <CampaignList records={records} agents={agents} onUpdate={refresh} />
       </Shell>
     );
-  if (number >= 8 && number <= 12)
+  if (
+    [
+      'widget-appearance',
+      'widget-greeting',
+      'widget-handoff',
+      'widget-availability',
+      'widget-publish',
+    ].includes(view)
+  )
     return (
-      <Shell workspace="owner" active="/flow/7">
+      <Shell workspace="owner" active="/widgets/overview">
         <WidgetSetup
-          number={number}
+          previousHref={previousHref}
+          view={view}
           config={config}
           form={form}
           setForm={setForm}
@@ -1326,27 +1328,27 @@ export default function FlowScreen({ number }) {
         />
       </Shell>
     );
-  if (number === 22)
+  if (view === 'incoming-call')
     return (
-      <Shell workspace="agent" active="/flow/24">
+      <Shell workspace="agent" active="/agent/live-call">
         <IncomingCallPopup records={records} selected={record} onUpdate={refresh} />
       </Shell>
     );
-  if (number === 23)
+  if (view === 'call-review')
     return (
-      <Shell workspace="agent" active="/flow/21">
+      <Shell workspace="agent" active="/agent/inbox">
         <CallReview records={records} selected={record} onSelect={choose} onUpdate={refresh} />
       </Shell>
     );
-  if (number === 24)
+  if (view === 'live-call')
     return (
-      <Shell workspace="agent" active="/flow/24">
+      <Shell workspace="agent" active="/agent/live-call">
         <LiveCallConsole records={records} selected={record} onSelect={choose} onUpdate={refresh} />
       </Shell>
     );
-  if (number === 25)
+  if (view === 'transfer-call')
     return (
-      <Shell workspace="agent" active="/flow/26">
+      <Shell workspace="agent" active="/agent/accept-transfer">
         <LiveCallConsole
           records={records}
           selected={record}
@@ -1364,9 +1366,9 @@ export default function FlowScreen({ number }) {
         />
       </Shell>
     );
-  if (number === 26)
+  if (view === 'accept-transfer')
     return (
-      <Shell workspace="agent" active="/flow/26">
+      <Shell workspace="agent" active="/agent/accept-transfer">
         <TransferAccept
           records={records}
           selected={record}
@@ -1377,9 +1379,9 @@ export default function FlowScreen({ number }) {
         />
       </Shell>
     );
-  if (number === 27)
+  if (view === 'call-outcome')
     return (
-      <Shell workspace="agent" active="/flow/27">
+      <Shell workspace="agent" active="/agent/call-outcome">
         <CallOutcome
           records={records}
           selected={record}
@@ -1392,11 +1394,11 @@ export default function FlowScreen({ number }) {
         />
       </Shell>
     );
-  if (number === 49 || number === 51)
+  if (view === 'campaign-monitoring' || view === 'campaign-results')
     return (
-      <Shell workspace="owner" active="/flow/43">
+      <Shell workspace="owner" active="/campaigns">
         <CampaignDashboard
-          number={number}
+          view={view}
           records={records}
           selected={record}
           onSelect={choose}
@@ -1404,11 +1406,23 @@ export default function FlowScreen({ number }) {
         />
       </Shell>
     );
-  if (number >= 34 && number <= 41)
+  if (
+    [
+      'agent-instructions',
+      'agent-knowledge',
+      'agent-actions',
+      'agent-advanced',
+      'agent-quality',
+      'agent-versions',
+      'inbound-routing',
+      'agent-performance',
+    ].includes(view)
+  )
     return (
-      <Shell workspace="owner" active={navigationFor(number)}>
+      <Shell workspace="owner" active={activeHref}>
         <AgentStudio
-          number={number}
+          previousHref={previousHref}
+          view={view}
           config={config}
           form={form}
           setForm={setForm}
@@ -1422,11 +1436,20 @@ export default function FlowScreen({ number }) {
         />
       </Shell>
     );
-  if (number >= 44 && number <= 48)
+  if (
+    [
+      'campaign-basics',
+      'campaign-contacts',
+      'campaign-calling-settings',
+      'campaign-schedule',
+      'campaign-review',
+    ].includes(view)
+  )
     return (
-      <Shell workspace="owner" active="/flow/43">
+      <Shell workspace="owner" active="/campaigns">
         <CampaignWizard
-          number={number}
+          previousHref={previousHref}
+          view={view}
           config={config}
           form={form}
           setForm={setForm}
@@ -1438,14 +1461,14 @@ export default function FlowScreen({ number }) {
         />
       </Shell>
     );
-  if (number === 50)
+  if (view === 'outbound-handoff')
     return (
-      <Shell workspace="agent" active="/flow/21">
+      <Shell workspace="agent" active="/agent/inbox">
         <OutboundHandoff records={records} selected={record} onSelect={choose} onUpdate={refresh} />
       </Shell>
     );
   return (
-    <Shell workspace={workspace} active={navigationFor(number)}>
+    <Shell workspace={workspace} active={activeHref}>
       {body}
     </Shell>
   );

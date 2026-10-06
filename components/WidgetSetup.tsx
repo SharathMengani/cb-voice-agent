@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -19,19 +20,26 @@ import {
 } from 'lucide-react';
 
 const steps = ['Agent', 'Appearance', 'Conversation', 'Website & hours', 'Test & install'];
+const stepLinks = [
+  '/widgets/overview',
+  '/widgets/setup/appearance',
+  '/widgets/setup/greeting',
+  '/widgets/setup/availability',
+  '/widgets/setup/publish',
+];
 const headings = {
-  8: 'Design your voice widget',
-  9: 'Set your greeting & caller details',
-  10: 'Route calls to your team',
-  11: 'Set website & availability',
-  12: 'Review, test & publish',
+  'widget-appearance': 'Design your voice widget',
+  'widget-greeting': 'Set your greeting & caller details',
+  'widget-handoff': 'Route calls to your team',
+  'widget-availability': 'Set website & availability',
+  'widget-publish': 'Review, test & publish',
 };
 const descriptions = {
-  8: 'Customize the look and behavior of your voice widget to match your brand.',
-  9: 'Welcome callers and collect the details your team needs.',
-  10: 'Set the conditions for a smooth AI-to-human handoff.',
-  11: 'Choose where and when the voice widget appears.',
-  12: 'Preview the widget, check its setup and publish your demo.',
+  'widget-appearance': 'Customize the look and behavior of your voice widget to match your brand.',
+  'widget-greeting': 'Welcome callers and collect the details your team needs.',
+  'widget-handoff': 'Set the conditions for a smooth AI-to-human handoff.',
+  'widget-availability': 'Choose where and when the voice widget appears.',
+  'widget-publish': 'Preview the widget, check its setup and publish your demo.',
 };
 function Field({ field, form, setForm }) {
   const value = form[field.label] ?? (field.type === 'color' ? '#7c3aed' : '');
@@ -79,7 +87,8 @@ function Field({ field, form, setForm }) {
   );
 }
 export default function WidgetSetup({
-  number,
+  previousHref,
+  view,
   config,
   form,
   setForm,
@@ -93,7 +102,14 @@ export default function WidgetSetup({
   const [device, setDevice] = useState('Desktop');
   const [copied, setCopied] = useState(false);
   const [mic, setMic] = useState(false);
-  const step = number === 8 ? 2 : number === 11 ? 4 : number === 12 ? 5 : 3;
+  const step =
+    view === 'widget-appearance'
+      ? 2
+      : view === 'widget-availability'
+        ? 4
+        : view === 'widget-publish'
+          ? 5
+          : 3;
   const code = `<script src="${embedOrigin}/chatbucket-voice.js" data-widget-id="${record?._id || 'WIDGET_ID'}"></script>`;
   const selectedAgent = record?.data?.screen_7?.['Voice agent'] || 'Website Support';
   const ready = Boolean(selectedAgent && record?.data?.screen_11?.['Allowed website URL']);
@@ -113,15 +129,15 @@ export default function WidgetSetup({
       }
     >
       <Link
-        href="/flow/7"
+        href="/widgets/overview"
         className={
           'back-campaign inline-flex items-center gap-1.75 text-[#bfbcd1] no-underline text-xs mb-3'
         }
       >
         <ArrowLeft size={16} /> Back to voice widgets
       </Link>
-      <h1>{headings[number]}</h1>
-      <p className={'widget-setup-caption text-[#b3b9c9] m-[0_0_22px]'}>{descriptions[number]}</p>
+      <h1>{headings[view]}</h1>
+      <p className={'widget-setup-caption text-[#b3b9c9] m-[0_0_22px]'}>{descriptions[view]}</p>
       <div
         className={
           "widget-stepper grid grid-cols-[repeat(5,_1fr)] gap-2.5 mb-5.5 [&_a]:no-underline [&_a]:text-[#bfc0d0] [&_a]:relative [&_a]:flex [&_a]:flex-col [&_a]:gap-1.25 [&_a]:text-xs [&_a]:min-w-0 [&_a:not(:last-child):after]:content-[''] [&_a:not(:last-child):after]:absolute [&_a:not(:last-child):after]:top-4 [&_a:not(:last-child):after]:left-10 [&_a:not(:last-child):after]:right--1 [&_a:not(:last-child):after]:h-0.5 [&_a:not(:last-child):after]:bg-[#55515f] [&_.done:after]:bg-[#9364fd]! [&_a>span]:bg-[#37363f] [&_a>span]:w-8 [&_a>span]:h-8 [&_a>span]:rounded-full [&_a>span]:grid [&_a>span]:place-items-center [&_a>span]:mb-1.25 [&_a>span]:z-[1] [&_a.current>span]:bg-[#7046eb] [&_a.current>span]:text-white [&_a.done>span]:bg-[#7046eb] [&_a.done>span]:text-white [&_small]:text-[11px] [&_small]:text-[#aeb0c3] [&_small]:overflow-hidden [&_small]:text-ellipsis max-[1000px]:[&_small]:hidden max-[600px]:[&_a_strong]:text-[10px]"
@@ -130,7 +146,7 @@ export default function WidgetSetup({
         {steps.map((label, i) => (
           <Link
             key={label}
-            href={i === 0 ? '/flow/7' : `/flow/${[8, 8, 9, 11, 12][i]}`}
+            href={stepLinks[i]}
             className={i + 1 === step ? 'current' : i + 1 < step ? 'done' : ''}
           >
             <span>{i + 1 < step ? <Check size={17} /> : i + 1}</span>
@@ -168,24 +184,24 @@ export default function WidgetSetup({
           }
         >
           <h2>
-            {number === 8
+            {view === 'widget-appearance'
               ? 'Brand identity'
-              : number === 9
+              : view === 'widget-greeting'
                 ? 'Conversation setup'
-                : number === 10
+                : view === 'widget-handoff'
                   ? 'Human handoff'
-                  : number === 11
+                  : view === 'widget-availability'
                     ? 'Website & hours'
                     : 'Test your voice widget'}
           </h2>
           <p>
-            {number === 8
+            {view === 'widget-appearance'
               ? 'Customize how your voice widget looks on your website.'
-              : number === 12
+              : view === 'widget-publish'
                 ? 'Try the voice preview and review your publish settings.'
                 : config.caption}
           </p>
-          {number !== 12 ? (
+          {view !== 'widget-publish' ? (
             <div
               className={
                 'widget-setup-fields grid grid-cols-[1fr_1fr] gap-3.5 max-[600px]:grid-cols-1'
@@ -224,13 +240,13 @@ export default function WidgetSetup({
               </p>
               <Link
                 className={'widget-test-link text-[#ac83ff] no-underline text-xs'}
-                href="/flow/28"
+                href="/customer/call"
               >
                 Open customer preview <ArrowRight size={15} />
               </Link>
             </div>
           )}
-          {number === 8 && (
+          {view === 'widget-appearance' && (
             <p
               className={
                 'widget-setup-tip flex gap-2 items-center border border-[#484253] rounded-lg p-3 text-[#c0b1db] m-[20px_0_0]!'
@@ -251,14 +267,14 @@ export default function WidgetSetup({
             }
           >
             <div>
-              <h2>{number === 12 ? 'Deployment readiness' : 'Live preview'}</h2>
+              <h2>{view === 'widget-publish' ? 'Deployment readiness' : 'Live preview'}</h2>
               <p>
-                {number === 12
+                {view === 'widget-publish'
                   ? 'Check the configuration and copy the demo script.'
                   : 'See how your website voice assistant looks.'}
               </p>
             </div>
-            {number === 8 && (
+            {view === 'widget-appearance' && (
               <div
                 className={
                   'device-switch flex border border-[#46404f] rounded-[7px] overflow-hidden [&_button]:p-[9px_13px] [&_button]:border-0 [&_button]:bg-none [&_button]:text-[#cec4da] [&_button]:cursor-pointer [&_button]:text-[11px] [&_button.active]:bg-[#6641e9] [&_button.active]:text-white'
@@ -279,7 +295,7 @@ export default function WidgetSetup({
               </div>
             )}
           </div>
-          {number === 12 ? (
+          {view === 'widget-publish' ? (
             <>
               <div
                 className={
@@ -389,9 +405,9 @@ export default function WidgetSetup({
                     <AudioLines size={28} />
                   </div>
                   <p>
-                    {number === 9
+                    {view === 'widget-greeting'
                       ? form['Welcome message'] || 'How can we help today?'
-                      : number === 10
+                      : view === 'widget-handoff'
                         ? 'Ask the AI, or request a human specialist.'
                         : 'Talk with our AI assistant'}
                   </p>
@@ -413,12 +429,12 @@ export default function WidgetSetup({
           className={
             'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
           }
-          href={`/flow/${number === 8 ? 7 : number === 12 ? 11 : number - 1}`}
+          href={previousHref}
         >
           <ArrowLeft size={16} /> Back
         </Link>
         <span>
-          {number === 12
+          {view === 'widget-publish'
             ? ready
               ? 'Ready for demo publishing'
               : 'Complete the website and agent setup to publish'
@@ -430,14 +446,17 @@ export default function WidgetSetup({
             'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,_#7c49f5,_#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
           }
           onClick={() =>
-            onSave({ advance: number !== 12, status: number === 12 ? 'published' : undefined })
+            onSave({
+              advance: view !== 'widget-publish',
+              status: view === 'widget-publish' ? 'published' : undefined,
+            })
           }
         >
           {working
             ? 'Saving…'
-            : number === 12
+            : view === 'widget-publish'
               ? 'Publish voice widget'
-              : number === 11
+              : view === 'widget-availability'
                 ? 'Continue to test & install'
                 : 'Save & continue'}{' '}
           <ArrowRight size={16} />

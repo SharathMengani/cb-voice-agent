@@ -34,7 +34,7 @@ export default function OwnerOverview({ records, onSelect, onUpdate }) {
     });
     if (response.ok) {
       await onUpdate();
-      window.location.href = '/flow/16';
+      window.location.href = '/calls/takeover';
     }
   }
   return (
@@ -222,7 +222,7 @@ export default function OwnerOverview({ records, onSelect, onUpdate }) {
                       </small>
                     </span>
                     <button onClick={() => accept(item)}>Accept call</button>
-                    <Link href="/flow/14">View</Link>
+                    <Link href="/inbox">View</Link>
                   </div>
                 ))
               ) : (
@@ -265,7 +265,7 @@ export default function OwnerOverview({ records, onSelect, onUpdate }) {
                     <strong>{item.data?.assignedAgent || 'Human agent'}</strong>
                     <small>{item.title}</small>
                   </span>
-                  <Link href="/flow/15">Monitor</Link>
+                  <Link href="/calls/live">Monitor</Link>
                 </div>
               ))}
               {!human.length && (
@@ -333,7 +333,7 @@ export default function OwnerOverview({ records, onSelect, onUpdate }) {
               className={
                 'overview-link inline-flex gap-1.75 items-center text-[#b995ff] no-underline text-[13px] [&.standalone]:border [&.standalone]:border-[#654ca5] [&.standalone]:p-3.25 [&.standalone]:rounded-[9px] [&.standalone]:w-full [&.standalone]:justify-center'
               }
-              href="/flow/18"
+              href="/callbacks"
             >
               Open callback requests <ArrowRight size={17} />
             </Link>
@@ -342,7 +342,7 @@ export default function OwnerOverview({ records, onSelect, onUpdate }) {
             className={
               'overview-link standalone inline-flex gap-1.75 items-center text-[#b995ff] no-underline text-[13px] [&.standalone]:border [&.standalone]:border-[#654ca5] [&.standalone]:p-3.25 [&.standalone]:rounded-[9px] [&.standalone]:w-full [&.standalone]:justify-center'
             }
-            href="/flow/14"
+            href="/inbox"
           >
             <PhoneIncoming size={18} /> View all incoming requests <ArrowRight size={16} />
           </Link>

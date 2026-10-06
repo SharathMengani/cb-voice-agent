@@ -17,11 +17,11 @@ import {
 } from 'lucide-react';
 import { apiFetch } from './api-client';
 
-export default function CampaignDashboard({ number, records, selected, onSelect, onUpdate }) {
+export default function CampaignDashboard({ view, records, selected, onSelect, onUpdate }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const campaign =
-    number === 51
+    view === 'campaign-results'
       ? records.find((row) => row.status === 'completed' && row._id === selected?._id) ||
         records.find((row) => row.status === 'completed') ||
         selected
@@ -85,7 +85,7 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
       }
     >
       <Link
-        href="/flow/43"
+        href="/campaigns"
         className={
           'back-campaign inline-flex items-center gap-1.75 text-[#bfbcd1] no-underline text-xs mb-3'
         }
@@ -99,12 +99,12 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
       >
         <div>
           <h1>
-            {number === 51
+            {view === 'campaign-results'
               ? 'Campaign results and call outcomes'
               : campaign?.title || 'Campaign monitoring'}
           </h1>
           <p>
-            {number === 51
+            {view === 'campaign-results'
               ? 'Overview of simulated outcomes for your campaign.'
               : 'Live campaign monitoring · simulated dialing and performance.'}
           </p>
@@ -114,7 +114,7 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
         >
           ● {campaign?.status || 'Not started'}
         </span>
-        {number === 49 && (
+        {view === 'campaign-monitoring' && (
           <div
             className={
               'campaign-actions flex gap-2 [&_button]:bg-[#4d3484] [&_button]:border [&_button]:border-[#9763fb] [&_button]:rounded-lg [&_button]:text-white [&_button]:p-[11px_15px] [&_button]:cursor-pointer [&_button]:flex [&_button]:gap-1.75 [&_button]:items-center [&_button]:[font:inherit] [&_button]:text-xs [&_button.stop]:border-[#e84772] [&_button.stop]:bg-[#582a3e] [&_button:disabled]:opacity-[.45] [&_button:disabled]:cursor-not-allowed'
@@ -154,7 +154,7 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
           'campaign-live-metrics grid grid-cols-[repeat(5,1fr)] gap-2.5 mb-4.5 [&_article]:border [&_article]:border-[#34404a] [&_article]:rounded-[10px] [&_article]:bg-[#15212a] [&_article]:p-4.25 [&_article]:flex [&_article]:items-center [&_article]:gap-3 [&_article]:min-w-0 [&_svg]:text-[#a977ff] [&_svg]:shrink-0 [&_article_span]:text-[#c8d0df] [&_article_span]:text-xs [&_article_strong]:block [&_article_strong]:text-[26px] [&_article_strong]:text-white [&_article_small]:text-[10px] [&_article_small]:text-[#8ea7b2] max-[850px]:grid-cols-[repeat(2,1fr)]'
         }
       >
-        {(number === 49
+        {(view === 'campaign-monitoring'
           ? [
               ['Eligible', total, Users],
               ['Attempted', stats.initiated || 0, Phone],
@@ -175,7 +175,7 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
             <span>
               {label}
               <strong>{value}</strong>
-              <small>{number === 51 ? 'Recorded in demo' : 'Simulation only'}</small>
+              <small>{view === 'campaign-results' ? 'Recorded in demo' : 'Simulation only'}</small>
             </span>
           </article>
         ))}
@@ -190,9 +190,9 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
             'campaign-live-card border border-[#34404a] rounded-[10px] bg-[#15212a] p-4.25 [&_h2]:text-[17px] [&_h2]:m-[0_0_6px] [&>p]:text-[#a9bbc4] [&>p]:text-xs [&>p]:m-[0_0_20px]'
           }
         >
-          <h2>{number === 51 ? 'Answered call breakdown' : 'Progress'}</h2>
+          <h2>{view === 'campaign-results' ? 'Answered call breakdown' : 'Progress'}</h2>
           <p>
-            {number === 51
+            {view === 'campaign-results'
               ? 'Campaign contact outcomes'
               : 'Outbound calling progress · eligible contacts'}
           </p>
@@ -293,7 +293,7 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
           }
         >
           <div>
-            <h2>{number === 51 ? 'Call outcomes' : 'Contact queue'}</h2>
+            <h2>{view === 'campaign-results' ? 'Call outcomes' : 'Contact queue'}</h2>
             <p className={'muted text-(--muted) m-0 leading-normal'}>
               Synthetic records from the entered campaign contacts.
             </p>
@@ -343,7 +343,7 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
                   ? 'Simulated attempt'
                   : 'Queued'}
             </span>
-            <Link href="/flow/50">
+            <Link href="/agent/outbound-handoff">
               Review handoff <ArrowRight size={14} />
             </Link>
           </div>
@@ -359,9 +359,12 @@ export default function CampaignDashboard({ number, records, selected, onSelect,
           'campaign-end-links flex justify-between p-[18px_0] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-1.75 [&_a]:text-[#bb9af5] [&_a]:no-underline [&_a]:text-xs'
         }
       >
-        <Link href="/flow/43">All campaigns</Link>
-        <Link href={number === 49 ? '/flow/51' : '/flow/49'}>
-          {number === 49 ? 'View outcomes' : 'View live monitoring'} <ArrowRight size={16} />
+        <Link href="/campaigns">All campaigns</Link>
+        <Link
+          href={view === 'campaign-monitoring' ? '/campaigns/results' : '/campaigns/monitoring'}
+        >
+          {view === 'campaign-monitoring' ? 'View outcomes' : 'View live monitoring'}{' '}
+          <ArrowRight size={16} />
         </Link>
       </div>
     </div>

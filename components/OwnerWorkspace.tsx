@@ -27,23 +27,29 @@ const statusText = {
   submitted: 'Submitted',
 };
 const groups = {
-  14: [
+  inbox: [
     'Incoming voice requests',
     'Review customer context before an owner or agent accepts the handoff.',
   ],
-  15: ['Live call monitoring', 'See live ownership and waiting requests across your team.'],
-  16: [
+  'live-calls': [
+    'Live call monitoring',
+    'See live ownership and waiting requests across your team.',
+  ],
+  'call-takeover': [
     'Owner call takeover',
     'Accept a waiting call or take responsibility for an active conversation.',
   ],
-  17: ['Call history & transcript', 'Review completed calls, outcome notes and transcript events.'],
-  18: ['Callback requests', 'Assign a follow-up and keep its status visible to the team.'],
-  19: ['Reviews & ratings', 'Read feedback submitted after customer calls.'],
-  20: ['Transfers', 'Track calls offered to another department or agent.'],
+  'call-history': [
+    'Call history & transcript',
+    'Review completed calls, outcome notes and transcript events.',
+  ],
+  callbacks: ['Callback requests', 'Assign a follow-up and keep its status visible to the team.'],
+  reviews: ['Reviews & ratings', 'Read feedback submitted after customer calls.'],
+  transfers: ['Transfers', 'Track calls offered to another department or agent.'],
 };
 
-function details(item, number) {
-  if (number === 18)
+function details(item, view) {
+  if (view === 'callbacks')
     return [
       [
         'Phone',
@@ -57,7 +63,7 @@ function details(item, number) {
       ],
       ['Preferred time', item.data?.screen_32?.['Preferred time'] || 'Not specified'],
     ];
-  if (number === 19)
+  if (view === 'reviews')
     return [
       ['Rating', `${item.data?.screen_33?.Rating || '—'} / 5`],
       ['Feedback', item.data?.screen_33?.['Your feedback'] || 'No written feedback'],
@@ -70,7 +76,7 @@ function details(item, number) {
   ];
 }
 
-export default function OwnerWorkspace({ number, records, selected, onSelect, onUpdate }) {
+export default function OwnerWorkspace({ view, records, selected, onSelect, onUpdate }) {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -80,11 +86,13 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
     () =>
       records
         .filter((item) => {
-          if (number === 14) return item.status === 'waiting';
-          if (number === 15) return ['waiting', 'human', 'transfer-pending'].includes(item.status);
-          if (number === 16) return ['waiting', 'human', 'transfer-pending'].includes(item.status);
-          if (number === 17) return item.status === 'ended';
-          if (number === 20)
+          if (view === 'inbox') return item.status === 'waiting';
+          if (view === 'live-calls')
+            return ['waiting', 'human', 'transfer-pending'].includes(item.status);
+          if (view === 'call-takeover')
+            return ['waiting', 'human', 'transfer-pending'].includes(item.status);
+          if (view === 'call-history') return item.status === 'ended';
+          if (view === 'transfers')
             return item.status === 'transfer-pending' || Boolean(item.data?.screen_25);
           return true;
         })
@@ -93,7 +101,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
             .toLowerCase()
             .includes(search.toLowerCase()),
         ),
-    [records, number, search],
+    [records, view, search],
   );
   const active = visible.find((item) => item._id === selected?._id) || visible[0];
   const waiting = records.filter((item) => item.status === 'waiting').length;
@@ -105,7 +113,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
     setFeedback('');
     try {
       const response = await apiFetch(
-        `/api/records/${number === 18 ? 'callback' : 'call'}/${item._id}`,
+        `/api/records/${view === 'callbacks' ? 'callback' : 'call'}/${item._id}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -115,10 +123,12 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
       const result = await response.json();
       if (!response.ok) throw Error(result.error || 'Update failed.');
       await onUpdate();
-      if (number === 16) router.push('/flow/24');
+      if (view === 'call-takeover') router.push('/agent/live-call');
       else
         setFeedback(
-          number === 18 ? `Callback assigned to ${assignedAgent}.` : 'Call assigned to the owner.',
+          view === 'callbacks'
+            ? `Callback assigned to ${assignedAgent}.`
+            : 'Call assigned to the owner.',
         );
     } catch (error) {
       setFeedback(error.message);
@@ -126,7 +136,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
       setWorking(false);
     }
   }
-  const [title, subtitle] = groups[number];
+  const [title, subtitle] = groups[view];
   return (
     <div className={'owner-workspace max-w-362.5 m-auto [&_.flow-alert]:m-[0_0_15px]'}>
       <div
@@ -134,7 +144,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
           'flow-breadcrumb flex items-center gap-2 text-[#aaa8bb] text-[13px] mb-4 [&_a]:text-[#b59cff]'
         }
       >
-        <Link href="/flow/13">← Voice overview</Link>
+        <Link href="/dashboard">← Voice overview</Link>
         <span> / {title}</span>
       </div>
       <header
@@ -167,23 +177,23 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
             <PhoneIncoming size={19} />
           </span>
           <small>Waiting requests</small>
-          <strong>{number === 18 || number === 19 ? '—' : waiting}</strong>
+          <strong>{view === 'callbacks' || view === 'reviews' ? '—' : waiting}</strong>
         </div>
         <div>
           <span>
             <Headphones size={19} />
           </span>
           <small>
-            {number === 18
+            {view === 'callbacks'
               ? 'Unassigned callbacks'
-              : number === 19
+              : view === 'reviews'
                 ? 'Feedback received'
                 : 'Live human calls'}
           </small>
           <strong>
-            {number === 18
+            {view === 'callbacks'
               ? records.filter((r) => r.status === 'requested').length
-              : number === 19
+              : view === 'reviews'
                 ? records.length
                 : humans}
           </strong>
@@ -193,16 +203,16 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
             <CheckCircle2 size={19} />
           </span>
           <small>
-            {number === 18
+            {view === 'callbacks'
               ? 'Completed callbacks'
-              : number === 19
+              : view === 'reviews'
                 ? 'Five-star reviews'
                 : 'Completed calls'}
           </small>
           <strong>
-            {number === 18
+            {view === 'callbacks'
               ? records.filter((r) => r.status === 'completed').length
-              : number === 19
+              : view === 'reviews'
                 ? records.filter((r) => r.data?.screen_33?.Rating === '5').length
                 : finished}
           </strong>
@@ -235,13 +245,13 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
           >
             <div>
               <h2>
-                {number === 17
+                {view === 'call-history'
                   ? 'Completed calls'
-                  : number === 20
+                  : view === 'transfers'
                     ? 'Transfer activity'
-                    : number === 19
+                    : view === 'reviews'
                       ? 'Customer reviews'
-                      : number === 18
+                      : view === 'callbacks'
                         ? 'Follow-up queue'
                         : 'Current calls'}
               </h2>
@@ -279,7 +289,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                 <span>
                   <strong>{item.title}</strong>
                   <small>
-                    {number === 19
+                    {view === 'reviews'
                       ? item.data?.screen_33?.['Your feedback'] || 'No written feedback'
                       : item.data?.screen_14?.['Issue summary'] ||
                         item.data?.screen_32?.['How can we help?'] ||
@@ -313,11 +323,11 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
             }
           >
             <span>
-              {number === 19 ? (
+              {view === 'reviews' ? (
                 <Star />
-              ) : number === 20 ? (
+              ) : view === 'transfers' ? (
                 <Repeat2 />
-              ) : number === 18 ? (
+              ) : view === 'callbacks' ? (
                 <Clock3 />
               ) : (
                 <UserRound />
@@ -335,14 +345,14 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                   'details-rows mt-3 [&>div]:flex [&>div]:justify-between [&>div]:items-center [&>div]:gap-3.75 [&>div]:p-[14px_0] [&>div]:border-b [&>div]:border-b-(--line) [&>div]:text-sm [&>div_span]:text-[#ada9bc] [&>div_strong]:text-right [&>div_strong]:max-w-[58%] [&>div_strong]:font-medium'
                 }
               >
-                {details(active, number).map(([label, value]) => (
+                {details(active, view).map(([label, value]) => (
                   <div key={label}>
                     <span>{label}</span>
                     <strong>{value}</strong>
                   </div>
                 ))}
               </div>
-              {number === 17 && (
+              {view === 'call-history' && (
                 <div
                   className={
                     'owner-workspace-transcript p-[19px_22px] border-t border-t-[#363846] [&_h3]:m-[0_0_13px] [&_h3]:text-sm [&_p]:text-[#c3c7d5] [&_p]:leading-[1.55] [&_p]:text-[13px] [&_p+b]:text-[#bca3ff]'
@@ -366,7 +376,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                   </p>
                 </div>
               )}
-              {number === 20 && (
+              {view === 'transfers' && (
                 <div
                   className={
                     'owner-workspace-transcript p-[19px_22px] border-t border-t-[#363846] [&_h3]:m-[0_0_13px] [&_h3]:text-sm [&_p]:text-[#c3c7d5] [&_p]:leading-[1.55] [&_p]:text-[13px] [&_p+b]:text-[#bca3ff]'
@@ -385,7 +395,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                   </p>
                 </div>
               )}
-              {number === 18 && active.status !== 'completed' && (
+              {view === 'callbacks' && active.status !== 'completed' && (
                 <div
                   className={
                     'owner-workspace-actions p-[19px_22px] border-t border-t-[#363846] [&_p]:text-[#c3c7d5] [&_p]:leading-[1.55] [&_p]:text-[13px] [&_.button]:w-full [&_.button]:mt-3.25'
@@ -417,7 +427,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                   </button>
                 </div>
               )}
-              {number === 16 && (
+              {view === 'call-takeover' && (
                 <div
                   className={
                     'owner-workspace-actions p-[19px_22px] border-t border-t-[#363846] [&_p]:text-[#c3c7d5] [&_p]:leading-[1.55] [&_p]:text-[13px] [&_.button]:w-full [&_.button]:mt-3.25'
@@ -437,7 +447,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                   </button>
                 </div>
               )}
-              {number === 14 && (
+              {view === 'inbox' && (
                 <div
                   className={
                     'owner-workspace-actions p-[19px_22px] border-t border-t-[#363846] [&_p]:text-[#c3c7d5] [&_p]:leading-[1.55] [&_p]:text-[13px] [&_.button]:w-full [&_.button]:mt-3.25'
@@ -447,14 +457,14 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                     className={
                       'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
                     }
-                    href="/flow/16"
+                    href="/calls/takeover"
                     onClick={() => onSelect(active)}
                   >
                     Review & accept <ArrowRight size={17} />
                   </Link>
                 </div>
               )}
-              {number === 15 && (
+              {view === 'live-calls' && (
                 <div
                   className={
                     'owner-workspace-actions p-[19px_22px] border-t border-t-[#363846] [&_p]:text-[#c3c7d5] [&_p]:leading-[1.55] [&_p]:text-[13px] [&_.button]:w-full [&_.button]:mt-3.25'
@@ -468,14 +478,14 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                     className={
                       'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
                     }
-                    href="/flow/16"
+                    href="/calls/takeover"
                     onClick={() => onSelect(active)}
                   >
                     Owner takeover <ArrowRight size={17} />
                   </Link>
                 </div>
               )}
-              {number === 20 && active.status === 'transfer-pending' && (
+              {view === 'transfers' && active.status === 'transfer-pending' && (
                 <div
                   className={
                     'owner-workspace-actions p-[19px_22px] border-t border-t-[#363846] [&_p]:text-[#c3c7d5] [&_p]:leading-[1.55] [&_p]:text-[13px] [&_.button]:w-full [&_.button]:mt-3.25'
@@ -485,7 +495,7 @@ export default function OwnerWorkspace({ number, records, selected, onSelect, on
                     className={
                       'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
                     }
-                    href="/flow/26"
+                    href="/agent/accept-transfer"
                     onClick={() => onSelect(active)}
                   >
                     Review transfer <ArrowRight size={17} />
