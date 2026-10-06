@@ -1,4 +1,6 @@
 'use client';
+import { usePathname } from 'next/navigation';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -27,24 +29,24 @@ import DemoControls from './DemoControls';
 
 const tabs = [
   ['Overview', '/voice-agents'],
-  ['Instructions', '/flow/34'],
-  ['Knowledge', '/flow/35'],
-  ['Actions', '/flow/36'],
-  ['Advanced', '/flow/37'],
-  ['Quality', '/flow/38'],
-  ['Versions', '/flow/39'],
-  ['Inbound', '/flow/40'],
-  ['Performance', '/flow/41'],
+  ['Instructions', '/voice-agents/studio/instructions'],
+  ['Knowledge', '/voice-agents/studio/knowledge'],
+  ['Actions', '/voice-agents/studio/actions'],
+  ['Advanced', '/voice-agents/studio/advanced'],
+  ['Quality', '/voice-agents/studio/quality'],
+  ['Versions', '/voice-agents/studio/versions'],
+  ['Inbound', '/voice-agents/studio/inbound'],
+  ['Performance', '/analytics/voice-agents'],
 ];
 const title = {
-  34: 'Agent instructions & prompt',
-  35: 'Knowledge sources',
-  36: 'Actions & integrations',
-  37: 'Advanced voice behaviour',
-  38: 'Call data & quality rules',
-  39: 'Test, publish & versions',
-  40: 'Phone number & inbound routing',
-  41: 'Voice agent performance',
+  'agent-instructions': 'Agent instructions & prompt',
+  'agent-knowledge': 'Knowledge sources',
+  'agent-actions': 'Actions & integrations',
+  'agent-advanced': 'Advanced voice behaviour',
+  'agent-quality': 'Call data & quality rules',
+  'agent-versions': 'Test, publish & versions',
+  'inbound-routing': 'Phone number & inbound routing',
+  'agent-performance': 'Voice agent performance',
 };
 function Field({ field, value, onChange, agents }) {
   const base = {
@@ -121,7 +123,8 @@ function Card({ icon: Icon, heading, sub, children }) {
 }
 
 export default function AgentStudio({
-  number,
+  previousHref,
+  view,
   config,
   form,
   setForm,
@@ -133,6 +136,7 @@ export default function AgentStudio({
   onSave,
   onUpdate,
 }) {
+  const pathname = usePathname();
   const [question, setQuestion] = useState('How do I install the widget?');
   const [answer, setAnswer] = useState('');
   const [testing, setTesting] = useState(false);
@@ -167,8 +171,11 @@ export default function AgentStudio({
   }
   const save = () => onSave({ advance: false });
   const next = () =>
-    onSave({ advance: number !== 41, status: number === 40 ? 'active' : undefined });
-  const performance = number === 41;
+    onSave({
+      advance: view !== 'agent-performance',
+      status: view === 'inbound-routing' ? 'active' : undefined,
+    });
+  const performance = view === 'agent-performance';
   return (
     <div className={'studio-page max-w-362.5 m-auto'}>
       <Link
@@ -223,7 +230,7 @@ export default function AgentStudio({
         aria-label="Voice agent settings"
       >
         {tabs.map(([name, href]) => (
-          <Link key={name} href={href} className={href === `/flow/${number}` ? 'active' : ''}>
+          <Link key={name} href={href} className={href === pathname ? 'active' : ''}>
             {name}
           </Link>
         ))}
@@ -234,14 +241,14 @@ export default function AgentStudio({
         }
       >
         <div>
-          <h2>{title[number]}</h2>
+          <h2>{title[view]}</h2>
           <p>
             {performance
               ? 'Workspace sample calls are not attributed to an individual AI agent.'
               : config.caption}
           </p>
         </div>
-        {number === 39 && (
+        {view === 'agent-versions' && (
           <span
             className={
               'status draft inline-flex rounded-[25px] p-[7px_12px] text-[13px] [&.ready]:text-[#5de5b8] [&.ready]:bg-[#133b32] [&.ready]:border [&.ready]:border-[#215544] [&.draft]:text-[#ffd17d] [&.draft]:bg-[#4a351a] [&.draft]:border [&.draft]:border-[#765020]'
@@ -261,7 +268,7 @@ export default function AgentStudio({
           {feedback}
         </p>
       )}
-      {number === 34 && (
+      {view === 'agent-instructions' && (
         <div
           className={
             'studio-columns grid grid-cols-[minmax(0,1.05fr)_minmax(340px,.8fr)] gap-4.25 items-start [&>div]:min-w-0 max-[1150px]:grid-cols-1'
@@ -365,7 +372,7 @@ export default function AgentStudio({
           </Card>
         </div>
       )}
-      {number === 35 && (
+      {view === 'agent-knowledge' && (
         <div
           className={
             'studio-columns grid grid-cols-[minmax(0,1.05fr)_minmax(340px,.8fr)] gap-4.25 items-start [&>div]:min-w-0 max-[1150px]:grid-cols-1'
@@ -445,7 +452,7 @@ export default function AgentStudio({
               </p>
             </Card>
             <DemoControls
-              number={35}
+              view="agent-knowledge"
               record={record}
               form={form}
               agents={agents}
@@ -454,7 +461,7 @@ export default function AgentStudio({
           </div>
         </div>
       )}
-      {number === 36 && (
+      {view === 'agent-actions' && (
         <div
           className={
             'studio-columns grid grid-cols-[minmax(0,1.05fr)_minmax(340px,.8fr)] gap-4.25 items-start [&>div]:min-w-0 max-[1150px]:grid-cols-1'
@@ -521,7 +528,7 @@ export default function AgentStudio({
           </Card>
         </div>
       )}
-      {number === 37 && (
+      {view === 'agent-advanced' && (
         <div
           className={
             'studio-columns grid grid-cols-[minmax(0,1.05fr)_minmax(340px,.8fr)] gap-4.25 items-start [&>div]:min-w-0 max-[1150px]:grid-cols-1'
@@ -588,7 +595,7 @@ export default function AgentStudio({
           </Card>
         </div>
       )}
-      {number === 38 && (
+      {view === 'agent-quality' && (
         <div
           className={
             'studio-columns grid grid-cols-[minmax(0,1.05fr)_minmax(340px,.8fr)] gap-4.25 items-start [&>div]:min-w-0 max-[1150px]:grid-cols-1'
@@ -645,7 +652,7 @@ export default function AgentStudio({
           </Card>
         </div>
       )}
-      {number === 39 && (
+      {view === 'agent-versions' && (
         <div
           className={
             'studio-columns grid grid-cols-[minmax(0,1.05fr)_minmax(340px,.8fr)] gap-4.25 items-start [&>div]:min-w-0 max-[1150px]:grid-cols-1'
@@ -725,7 +732,7 @@ export default function AgentStudio({
           </Card>
         </div>
       )}
-      {number === 40 && (
+      {view === 'inbound-routing' && (
         <div
           className={
             'studio-columns grid grid-cols-[minmax(0,1.05fr)_minmax(340px,.8fr)] gap-4.25 items-start [&>div]:min-w-0 max-[1150px]:grid-cols-1'
@@ -776,7 +783,7 @@ export default function AgentStudio({
               </p>
             </div>
             <DemoControls
-              number={42}
+              view="inbound-call"
               record={record}
               form={form}
               agents={agents}
@@ -785,7 +792,7 @@ export default function AgentStudio({
           </Card>
         </div>
       )}
-      {number === 41 && (
+      {view === 'agent-performance' && (
         <>
           <div
             className={
@@ -845,7 +852,7 @@ export default function AgentStudio({
                 className={
                   'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
                 }
-                href="/flow/17"
+                href="/calls/history"
               >
                 View call history
               </Link>
@@ -863,7 +870,7 @@ export default function AgentStudio({
             className={
               'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
             }
-            href={number === 34 ? '/voice-agents' : `/flow/${number - 1}`}
+            href={previousHref}
           >
             <ArrowLeft size={16} /> Previous
           </Link>
@@ -886,9 +893,9 @@ export default function AgentStudio({
             >
               {working
                 ? 'Saving…'
-                : number === 40
+                : view === 'inbound-routing'
                   ? 'Save inbound route'
-                  : number === 39
+                  : view === 'agent-versions'
                     ? 'Save draft version'
                     : 'Save & continue'}{' '}
               <ArrowRight size={16} />

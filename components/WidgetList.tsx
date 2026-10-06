@@ -59,7 +59,7 @@ export default function WidgetList({ records, agents, onUpdate }) {
       if (!response.ok) throw Error(data.error || 'Could not create widget.');
       localStorage.setItem('chatbucket:widget', data._id);
       await onUpdate();
-      router.push('/flow/8');
+      router.push('/widgets/setup/appearance');
     } catch (e) {
       setError(e.message);
     } finally {
@@ -197,7 +197,7 @@ export default function WidgetList({ records, agents, onUpdate }) {
                 <button
                   onClick={() => {
                     localStorage.setItem('chatbucket:widget', item._id);
-                    router.push('/flow/8');
+                    router.push('/widgets/setup/appearance');
                   }}
                 >
                   <Edit3 size={15} /> Edit

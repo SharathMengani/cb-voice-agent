@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -19,6 +20,13 @@ import {
 import { apiFetch } from './api-client';
 
 const stepNames = ['Basics & agent', 'Contacts', 'Calling settings', 'Schedule', 'Review & launch'];
+const stepLinks = [
+  '/campaigns/new/basics',
+  '/campaigns/new/contacts',
+  '/campaigns/new/calling-settings',
+  '/campaigns/new/schedule',
+  '/campaigns/new/review',
+];
 function Field({ field, value, onChange, agents }) {
   const props = {
     value: value ?? '',
@@ -80,11 +88,11 @@ function Panel({ title, description, children }) {
     </section>
   );
 }
-function Summary({ record, form, number, agents }) {
-  const basics = number === 44 ? form : record?.data?.screen_44 || {};
-  const contacts = number === 45 ? form : record?.data?.screen_45 || {};
-  const calling = number === 46 ? form : record?.data?.screen_46 || {};
-  const schedule = number === 47 ? form : record?.data?.screen_47 || {};
+function Summary({ record, form, view, agents }) {
+  const basics = view === 'campaign-basics' ? form : record?.data?.screen_44 || {};
+  const contacts = view === 'campaign-contacts' ? form : record?.data?.screen_45 || {};
+  const calling = view === 'campaign-calling-settings' ? form : record?.data?.screen_46 || {};
+  const schedule = view === 'campaign-schedule' ? form : record?.data?.screen_47 || {};
   return (
     <Panel title="Campaign summary" description="Current saved settings and launch prerequisites.">
       <div
@@ -112,7 +120,7 @@ function Summary({ record, form, number, agents }) {
           </div>
         ))}
       </div>
-      {number === 48 && (
+      {view === 'campaign-review' && (
         <div
           className={
             'campaign-wizard-note border border-[#574976] bg-[linear-gradient(110deg,#29233a,#242230)] text-[#d6cbea] rounded-[9px] p-[13px_15px] mt-4.25 text-[13px] leading-normal [&_svg]:align-middle'
@@ -127,7 +135,8 @@ function Summary({ record, form, number, agents }) {
 }
 
 export default function CampaignWizard({
-  number,
+  previousHref,
+  view,
   config,
   record,
   form,
@@ -137,6 +146,13 @@ export default function CampaignWizard({
   feedback,
   onSave,
 }) {
+  const stepIndex = [
+    'campaign-basics',
+    'campaign-contacts',
+    'campaign-calling-settings',
+    'campaign-schedule',
+    'campaign-review',
+  ].indexOf(view);
   const [importMessage, setImportMessage] = useState('');
   const [preview, setPreview] = useState('');
   const [checking, setChecking] = useState(false);
@@ -205,7 +221,7 @@ export default function CampaignWizard({
   return (
     <div className={'campaign-wizard max-w-362.5 m-auto'}>
       <Link
-        href="/flow/43"
+        href="/campaigns"
         className={
           'studio-back inline-flex items-center gap-2.5 text-[#c8c9d8] text-sm m-[6px_0_19px]'
         }
@@ -251,11 +267,11 @@ export default function CampaignWizard({
       >
         {stepNames.map((name, index) => (
           <Link
-            className={index === number - 44 ? 'active' : index < number - 44 ? 'done' : ''}
+            className={index === stepIndex ? 'active' : index < stepIndex ? 'done' : ''}
             key={name}
-            href={`/flow/${44 + index}`}
+            href={stepLinks[index]}
           >
-            <span>{index < number - 44 ? <Check size={16} /> : index + 1}</span>
+            <span>{index < stepIndex ? <Check size={16} /> : index + 1}</span>
             {name}
           </Link>
         ))}
@@ -269,7 +285,7 @@ export default function CampaignWizard({
           <h2>{config.title}</h2>
           <p>{config.caption}</p>
         </div>
-        <span>Step {number - 43} of 5</span>
+        <span>Step {stepIndex + 1} of 5</span>
       </div>
       {feedback && (
         <div
@@ -287,7 +303,7 @@ export default function CampaignWizard({
         }
       >
         <div>
-          {number === 44 && (
+          {view === 'campaign-basics' && (
             <>
               <Panel
                 title="Campaign basics"
@@ -326,7 +342,7 @@ export default function CampaignWizard({
               </Panel>
             </>
           )}
-          {number === 45 && (
+          {view === 'campaign-contacts' && (
             <>
               <Panel
                 title="Upload contacts"
@@ -394,7 +410,7 @@ export default function CampaignWizard({
               </Panel>
             </>
           )}
-          {number === 46 && (
+          {view === 'campaign-calling-settings' && (
             <>
               <Panel
                 title="Caller number & outbound calling pool"
@@ -445,7 +461,7 @@ export default function CampaignWizard({
               </Panel>
             </>
           )}
-          {number === 47 && (
+          {view === 'campaign-schedule' && (
             <>
               <Panel
                 title="Campaign schedule"
@@ -480,7 +496,7 @@ export default function CampaignWizard({
               </Panel>
             </>
           )}
-          {number === 48 && (
+          {view === 'campaign-review' && (
             <>
               <Panel
                 title="Campaign summary"
@@ -531,7 +547,7 @@ export default function CampaignWizard({
           )}
         </div>
         <aside>
-          <Summary record={record} form={form} number={number} agents={agents} />
+          <Summary record={record} form={form} view={view} agents={agents} />
           <Panel title="Eligibility preview" description="Format check for the numbers entered.">
             <div
               className={
@@ -570,7 +586,7 @@ export default function CampaignWizard({
           className={
             'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
           }
-          href={number === 44 ? '/flow/43' : `/flow/${number - 1}`}
+          href={previousHref}
         >
           <ArrowLeft size={16} /> Previous
         </Link>
@@ -589,11 +605,18 @@ export default function CampaignWizard({
               'button primary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
             }
             onClick={() =>
-              onSave({ advance: number !== 48, status: number === 48 ? 'scheduled' : undefined })
+              onSave({
+                advance: view !== 'campaign-review',
+                status: view === 'campaign-review' ? 'scheduled' : undefined,
+              })
             }
             disabled={working}
           >
-            {working ? 'Saving…' : number === 48 ? 'Schedule demo campaign' : 'Continue'}{' '}
+            {working
+              ? 'Saving…'
+              : view === 'campaign-review'
+                ? 'Schedule demo campaign'
+                : 'Continue'}{' '}
             <ArrowRight size={16} />
           </button>
         </div>

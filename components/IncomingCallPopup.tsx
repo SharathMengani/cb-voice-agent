@@ -39,7 +39,7 @@ export default function IncomingCallPopup({ records, selected, onUpdate }) {
       if (!response.ok) throw Error(value.error);
       localStorage.setItem('chatbucket:call', waiting._id);
       await onUpdate();
-      router.push('/flow/24');
+      router.push('/agent/live-call');
     } catch (error) {
       setFeedback(error.message);
     } finally {
@@ -111,7 +111,7 @@ export default function IncomingCallPopup({ records, selected, onUpdate }) {
             <strong>Incoming from AI Voice Agent</strong>
             <p>Handoff to human agent</p>
           </div>
-          <Link href="/flow/21" aria-label="Close popup">
+          <Link href="/agent/inbox" aria-label="Close popup">
             <X size={23} />
           </Link>
         </header>
@@ -179,12 +179,12 @@ export default function IncomingCallPopup({ records, selected, onUpdate }) {
           <button onClick={accept} disabled={busy || !waiting}>
             <Phone size={18} /> {busy ? 'Joining…' : 'Accept call'}
           </button>
-          <Link href="/flow/21">
+          <Link href="/agent/inbox">
             <CircleMinus size={18} /> Decline
           </Link>
         </div>
         <Link
-          href="/flow/23"
+          href="/agent/call-review"
           className={
             'popup-review text-[#b882ff] flex items-center justify-center gap-2 no-underline text-[13px]'
           }

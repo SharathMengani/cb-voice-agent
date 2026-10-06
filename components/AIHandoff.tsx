@@ -419,7 +419,7 @@ export default function AIHandoff() {
                       className={
                         'tl-secondary inline-flex items-center justify-center gap-2 rounded-[9px] font-bold text-[13px] p-[10px_15px] border border-[#9d76f2] text-white! bg-[#8057e8] whitespace-nowrap text-[#eee7f7]! bg-[#2c2935] border-[#554a61] [&:hover]:bg-[#393244]'
                       }
-                      href="/flow/18"
+                      href="/callbacks"
                     >
                       <PhoneCall size={16} /> View callbacks
                     </Link>

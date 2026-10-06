@@ -21,32 +21,32 @@ import {
 } from 'lucide-react';
 
 const navigation = [
-  { label: 'Dashboard', icon: LayoutDashboard, href: '/flow/13' },
-  { label: 'Inbox', icon: Inbox, href: '/flow/14' },
+  { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
+  { label: 'Inbox', icon: Inbox, href: '/inbox' },
   { label: 'Team', icon: Users, href: '/team' },
-  { label: 'Live Calls', icon: Phone, href: '/flow/15' },
-  { label: 'Callback Requests', icon: CalendarClock, href: '/flow/18' },
-  { label: 'Reviews & Ratings', icon: Star, href: '/flow/19' },
-  { label: 'History', icon: History, href: '/flow/17' },
-  { label: 'Transfers', icon: Repeat2, href: '/flow/20' },
+  { label: 'Live Calls', icon: Phone, href: '/calls/live' },
+  { label: 'Callback Requests', icon: CalendarClock, href: '/callbacks' },
+  { label: 'Reviews & Ratings', icon: Star, href: '/reviews' },
+  { label: 'History', icon: History, href: '/calls/history' },
+  { label: 'Transfers', icon: Repeat2, href: '/transfers' },
   { label: 'Conversational voice agent', icon: AudioLines, href: '/voice-agents' },
   { label: 'Voice Widgets', icon: PanelsTopLeft, href: '/widgets' },
   { label: 'Workflows', icon: Workflow, href: '/workflows' },
   { label: 'Tools', icon: Wrench, href: '/tools' },
   { label: 'AI Handoff', icon: Headphones, href: '/ai-handoff' },
-  { label: 'Campaigns', icon: Repeat2, href: '/flow/43' },
+  { label: 'Campaigns', icon: Repeat2, href: '/campaigns' },
   { label: 'Phone Numbers', icon: Phone, href: '/numbers' },
   { label: 'Call Routing', icon: Phone, href: '/routing' },
-  { label: 'Analytics', icon: LayoutDashboard, href: '/flow/41' },
+  { label: 'Analytics', icon: LayoutDashboard, href: '/analytics/voice-agents' },
   { label: 'Settings', icon: Settings2, href: '/settings' },
 ];
 
 const agentNavigation = [
-  { label: 'Inbox', icon: Inbox, href: '/flow/21' },
-  { label: 'My Calls', icon: Phone, href: '/flow/24' },
-  { label: 'History', icon: History, href: '/flow/27' },
-  { label: 'Transfers', icon: Repeat2, href: '/flow/26' },
-  { label: 'Profile & Settings', icon: Settings2, href: '/flow/21' },
+  { label: 'Inbox', icon: Inbox, href: '/agent/inbox' },
+  { label: 'My Calls', icon: Phone, href: '/agent/live-call' },
+  { label: 'History', icon: History, href: '/agent/call-outcome' },
+  { label: 'Transfers', icon: Repeat2, href: '/agent/accept-transfer' },
+  { label: 'Profile & Settings', icon: Settings2, href: '/agent/inbox' },
 ];
 
 export default function Shell({ children, workspace = 'owner', active = '' }) {
@@ -85,7 +85,7 @@ export default function Shell({ children, workspace = 'owner', active = '' }) {
         >
           {items.map(({ label, icon: Icon, href }) => (
             <Link
-              className={`nav-item min-h-12.75 flex gap-4 items-center p-[0_15px] text-[#d8d7e5] text-sm rounded-lg [&.selected]:bg-[linear-gradient(100deg,#3a2864,#5a38a8)] [&.selected]:text-white [&.selected]:shadow-[inset_3px_0_#956dff] [&.upcoming]:opacity-[.76] [&.upcoming]:cursor-default [&_svg]:flex-none max-[800px]:whitespace-nowrap max-[800px]:min-h-10 max-[800px]:p-[0_10px] max-[800px]:text-xs max-[800px]:[&.upcoming]:hidden ${active === href || (active?.startsWith('/workflows') && href === '/workflows') || (!active && href === '/voice-agents') ? 'selected' : ''}`}
+              className={`nav-item min-h-12.75 flex gap-4 items-center p-[0_15px] text-[#d8d7e5] text-sm rounded-lg [&.selected]:bg-[linear-gradient(100deg,#3a2864,#5a38a8)] [&.selected]:text-white [&.selected]:shadow-[inset_3px_0_#956dff] [&.upcoming]:opacity-[.76] [&.upcoming]:cursor-default [&_svg]:flex-none max-[800px]:whitespace-nowrap max-[800px]:min-h-10 max-[800px]:p-[0_10px] max-[800px]:text-xs max-[800px]:[&.upcoming]:hidden ${active === href || active?.startsWith(`${href}/`) || (!active && href === '/voice-agents') ? 'selected' : ''}`}
               key={label}
               href={href}
             >
@@ -133,7 +133,7 @@ export default function Shell({ children, workspace = 'owner', active = '' }) {
               }
             >
               <Link
-                href="/flow/13"
+                href="/dashboard"
                 className={
                   workspace ===
                   'owner font-semibold [&_small]:block [&_small]:text-(--muted) [&_small]:text-xs [&_small]:font-normal max-[800px]:hidden'
@@ -143,7 +143,7 @@ export default function Shell({ children, workspace = 'owner', active = '' }) {
               >
                 Owner workspace
               </Link>
-              <Link href="/flow/21" className={workspace === 'agent' ? 'active' : ''}>
+              <Link href="/agent/inbox" className={workspace === 'agent' ? 'active' : ''}>
                 Human Agent
               </Link>
             </div>

@@ -13,39 +13,50 @@ import {
 import { apiFetch } from './api-client';
 
 const explain = {
-  13: 'Add a sample inbound request to the live queue.',
-  14: 'Create a new waiting caller with the issue entered on this page.',
-  17: 'Read the selected call’s recorded demo events.',
-  24: 'The controls update call ownership and outcome in this local demo.',
-  29: 'Ask the demo AI a question; its sample FAQ is used to answer.',
-  35: 'Preview a keyword answer from the selected agent’s FAQ.',
-  42: 'Create a simulated inbound phone call without dialing a number.',
-  45: 'Inspect duplicate and invalid contacts before campaign launch.',
-  49: 'Run a short campaign simulation and watch counters update.',
-  50: 'Join this sample AI-to-human handoff.',
+  dashboard: 'Add a sample inbound request to the live queue.',
+  inbox: 'Create a new waiting caller with the issue entered on this page.',
+  'call-history': 'Read the selected call’s recorded demo events.',
+  'live-call': 'The controls update call ownership and outcome in this local demo.',
+  'ai-conversation': 'Ask the demo AI a question; its sample FAQ is used to answer.',
+  'agent-knowledge': 'Preview a keyword answer from the selected agent’s FAQ.',
+  'inbound-call': 'Create a simulated inbound phone call without dialing a number.',
+  'campaign-contacts': 'Inspect duplicate and invalid contacts before campaign launch.',
+  'campaign-monitoring': 'Run a short campaign simulation and watch counters update.',
+  'outbound-handoff': 'Join this sample AI-to-human handoff.',
 };
-const eligible = new Set([13, 14, 17, 24, 29, 35, 42, 45, 49, 50]);
-export default function DemoControls({ number, record, form, agents, onUpdate }) {
+const eligible = new Set([
+  'dashboard',
+  'inbox',
+  'call-history',
+  'live-call',
+  'ai-conversation',
+  'agent-knowledge',
+  'inbound-call',
+  'campaign-contacts',
+  'campaign-monitoring',
+  'outbound-handoff',
+]);
+export default function DemoControls({ view, record, form, agents, onUpdate }) {
   const [result, setResult] = useState('');
   const [busy, setBusy] = useState(false);
-  if (!eligible.has(number)) return null;
+  if (!eligible.has(view)) return null;
   async function run() {
     setBusy(true);
     setResult('');
     try {
       let response;
-      if ([13, 14, 42].includes(number))
+      if (['dashboard', 'inbox', 'inbound-call'].includes(view))
         response = await apiFetch('/api/demo/calls/inbound', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             caller: form['Caller name'] || 'New demo caller',
             issue: form['Issue summary'] || 'Please connect me to support',
-            channel: number === 42 ? 'phone' : 'web',
+            channel: view === 'inbound-call' ? 'phone' : 'web',
             department: form['Department'],
           }),
         });
-      else if ([29, 35].includes(number))
+      else if (['ai-conversation', 'agent-knowledge'].includes(view))
         response = await apiFetch('/api/demo/voice/answer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -55,19 +66,19 @@ export default function DemoControls({ number, record, form, agents, onUpdate })
               form['Your question'] || form['FAQ question'] || 'How do I install the widget?',
           }),
         });
-      else if (number === 45) {
+      else if (view === 'campaign-contacts') {
         if (!record) throw Error('Create a campaign first');
         response = await apiFetch(`/api/demo/campaigns/${record._id}/eligibility`);
-      } else if (number === 49) {
+      } else if (view === 'campaign-monitoring') {
         if (!record) throw Error('Choose a scheduled campaign first');
         response = await apiFetch(`/api/demo/campaigns/${record._id}/run`, { method: 'POST' });
-      } else if ([17, 24, 50].includes(number)) {
+      } else if (['call-history', 'live-call', 'outbound-handoff'].includes(view)) {
         if (!record) throw Error('Choose a call first');
         response = await apiFetch(`/api/records/call/${record._id}`);
       }
       const value = await response.json();
       if (!response.ok) throw Error(value.error || 'Demo action could not be completed');
-      if ([29, 35].includes(number)) {
+      if (['ai-conversation', 'agent-knowledge'].includes(view)) {
         setResult(value.answer);
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
           window.speechSynthesis.cancel();
@@ -76,13 +87,13 @@ export default function DemoControls({ number, record, form, agents, onUpdate })
           utterance.rate = 0.94;
           window.speechSynthesis.speak(utterance);
         }
-      } else if (number === 45)
+      } else if (view === 'campaign-contacts')
         setResult(
           `${value.uploaded} uploaded · ${value.eligible} eligible · ${value.excluded} excluded (${value.duplicates} duplicate).`,
         );
-      else if (number === 49)
+      else if (view === 'campaign-monitoring')
         setResult(`Campaign ${value.status}. Refreshing counters every few seconds.`);
-      else if ([17, 24, 50].includes(number))
+      else if (['call-history', 'live-call', 'outbound-handoff'].includes(view))
         setResult(
           (value.data?.transcript || [])
             .map((item) => `${item.speaker}: ${item.text}`)
@@ -90,7 +101,7 @@ export default function DemoControls({ number, record, form, agents, onUpdate })
         );
       else
         setResult(
-          `Demo ${number === 42 ? 'phone' : 'web'} call created. Open the owner inbox or human agent workspace to continue.`,
+          `Demo ${view === 'inbound-call' ? 'phone' : 'web'} call created. Open the owner inbox or human agent workspace to continue.`,
         );
       await onUpdate();
     } catch (error) {
@@ -128,16 +139,16 @@ export default function DemoControls({ number, record, form, agents, onUpdate })
     }
   }
   const labels = {
-    13: 'Create waiting call',
-    14: 'Simulate incoming call',
-    17: 'Open transcript',
-    24: 'Show transcript',
-    29: 'Ask demo AI',
-    35: 'Preview answer',
-    42: 'Simulate phone call',
-    45: 'Check eligibility',
-    49: 'Run campaign demo',
-    50: 'View AI context',
+    dashboard: 'Create waiting call',
+    inbox: 'Simulate incoming call',
+    'call-history': 'Open transcript',
+    'live-call': 'Show transcript',
+    'ai-conversation': 'Ask demo AI',
+    'agent-knowledge': 'Preview answer',
+    'inbound-call': 'Simulate phone call',
+    'campaign-contacts': 'Check eligibility',
+    'campaign-monitoring': 'Run campaign demo',
+    'outbound-handoff': 'View AI context',
   };
   return (
     <section
@@ -162,19 +173,19 @@ export default function DemoControls({ number, record, form, agents, onUpdate })
             'heading-icon bg-[#362452] text-[#bf9aff] rounded-lg w-10.5 h-10.5 grid place-items-center flex-none'
           }
         >
-          {[49, 45].includes(number) ? (
+          {['campaign-monitoring', 'campaign-contacts'].includes(view) ? (
             <Megaphone size={20} />
-          ) : number === 35 ? (
+          ) : view === 'agent-knowledge' ? (
             <BookOpen size={20} />
           ) : (
             <AudioLines size={20} />
           )}
         </span>
         <div>
-          <h3>{labels[number]}</h3>
-          <p>{explain[number]}</p>
+          <h3>{labels[view]}</h3>
+          <p>{explain[view]}</p>
         </div>
-        {number === 35 && (
+        {view === 'agent-knowledge' && (
           <button
             className={
               'button secondary inline-flex items-center justify-center gap-2.25 rounded-lg border border-(--line) h-10.75 p-[0_18px] text-(--text) text-sm whitespace-nowrap bg-(--panel2) font-semibold [&.primary]:border-[#784afa] [&.primary]:bg-[linear-gradient(125deg,#7c49f5,#5a30e4)] [&.primary]:shadow-[0_4px_18px_#511fc533] [&.primary:hover]:brightness-[1.14] [&.secondary:hover]:border-[#8561dd] [&.subtle:hover]:border-[#8561dd] [&.small]:h-8.75 [&.small]:p-[0_13px] [&.subtle]:bg-[#272832] font-[590]'
@@ -192,7 +203,7 @@ export default function DemoControls({ number, record, form, agents, onUpdate })
           disabled={busy}
           onClick={run}
         >
-          {busy ? 'Running…' : labels[number]}
+          {busy ? 'Running…' : labels[view]}
         </button>
       </div>
       {result && (
